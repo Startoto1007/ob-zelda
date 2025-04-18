@@ -23,9 +23,9 @@ export default (client) => {
 
     // Création de l'embed pour un autre canal
     const secondEmbed = new EmbedBuilder()
-      .setColor('#FF0000')
-      .setTitle('Un nouveau membre a rejoint !')
-      .setDescription(`Bienvenue à ${member.user.username} ! 🎉`)
+      .setColor("#f500c0")
+      .setTitle(`${member.user.username} a rejoint le serveur !`)
+      .setDescription(`Que tout le monde dise bonjour à ${member.user.toString()} !`)
       .setThumbnail(member.user.displayAvatarURL())
       .setTimestamp();
 
