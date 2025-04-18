@@ -12,20 +12,24 @@ export default (client) => {
         .setImage("https://i.imgur.com/4ug9AH9.jpeg")
         .setTimestamp();
 
-      // Envoie le message dans le même canal
+      // Envoie le message directement à l'utilisateur (en DM)
+      try {
+        await member.send({ embeds: [welcomeEmbed] });
+      } catch (error) {
+        console.error("Impossible d'envoyer un DM à l'utilisateur :", error);
+      }
+
+      // Création de l'embed pour annoncer le membre dans un canal public
+      const secondEmbed = new EmbedBuilder()
+        .setColor("#f500c0")
+        .setTitle(`${member.user.username} a rejoint le serveur !`)
+        .setDescription(`Que tout le monde dise bonjour à ${member.user.toString()} !`)
+        .setThumbnail(member.user.displayAvatarURL())
+        .setTimestamp();
+
+      // Envoie l'embed dans le canal spécifique
       const channel = member.guild.channels.cache.get('1348227800355569707'); // ID du canal
       if (channel) {
-        await channel.send({ embeds: [welcomeEmbed] });
-        
-        // Création de l'embed pour annoncer le membre
-        const secondEmbed = new EmbedBuilder()
-          .setColor("#f500c0")
-          .setTitle(`${member.user.username} a rejoint le serveur !`)
-          .setDescription(`Que tout le monde dise bonjour à ${member.user.toString()} !`)
-          .setThumbnail(member.user.displayAvatarURL())
-          .setTimestamp();
-
-        // Envoie l'autre message dans le même canal
         await channel.send({ embeds: [secondEmbed] });
       } else {
         console.error("Canal introuvable !");
