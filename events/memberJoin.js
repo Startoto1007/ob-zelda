@@ -1,69 +1,84 @@
-import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import sharp from 'sharp'; // Import de sharp pour manipuler les images
+import { EmbedBuilder } from 'discord.js';
+import { createCanvas, loadImage } from 'canvas';
+import fs from 'fs';
+import fetch from 'node-fetch';
 
 export default (client) => {
-  // Événement lorsque quelqu'un rejoint le serveur
   client.on('guildMemberAdd', async (member) => {
     try {
+      // Téléchargement de l'image d'arrière-plan
+      const backgroundImageUrl = 'https://res.cloudinary.com/dor9octmp/image/upload/v1744971567/Capture_d_e%CC%81cran_2025-04-18_a%CC%80_11.27.22_fncjkw.png';
+      const response = await fetch(backgroundImageUrl);
+      const buffer = await response.buffer();
+      const backgroundFilePath = './background-image.png';
+      fs.writeFileSync(backgroundFilePath, buffer);
+
+      // Création de l'avatar du membre
+      const avatarUrl = member.user.displayAvatarURL({ format: 'png', size: 128 });
+      const avatarResponse = await fetch(avatarUrl);
+      const avatarBuffer = await avatarResponse.buffer();
+      const avatarFilePath = './avatar.png';
+      fs.writeFileSync(avatarFilePath, avatarBuffer);
+
       // Chargement des images
-      const backgroundImage = 'https://i.imgur.com/JnSa4Eh.jpeg'; // Image d'arrière-plan
-      const avatarURL = member.user.displayAvatarURL(); // Avatar du membre
+      const backgroundImage = await loadImage(backgroundFilePath);
+      const avatarImage = await loadImage(avatarFilePath);
 
-      // Créer l'image d'arrière-plan floutée avec sharp
-      const background = await sharp(backgroundImage)
-        .resize(800, 600) // Adapter l'arrière-plan à la taille souhaitée
-        .blur(2) // Appliquer un léger flou
-        .png() // Convertir en PNG
-        .toBuffer(); // Convertir en buffer pour pouvoir l'utiliser
+      // Création du canvas
+      const canvas = createCanvas(backgroundImage.width, backgroundImage.height);
+      const ctx = canvas.getContext('2d');
+      
+      // Ajouter l'image d'arrière-plan (floutée légèrement si besoin)
+      ctx.drawImage(backgroundImage, 0, 0);
 
-      // Redimensionner l'avatar du membre
-      const avatar = await sharp(avatarURL)
-        .resize(200, 200) // Taille de l'avatar
-        .toBuffer(); // Convertir en buffer
+      // Ajouter l'avatar du membre à gauche
+      const avatarSize = 128; // Taille de l'avatar
+      ctx.beginPath();
+      ctx.arc(avatarSize / 2, backgroundImage.height / 2, avatarSize / 2, 0, Math.PI * 2, false);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(avatarImage, 0, backgroundImage.height / 2 - avatarSize / 2, avatarSize, avatarSize);
+      
+      // Ajouter le texte "Bienvenue dans le royaume d'Hyrule" à droite de l'avatar
+      ctx.font = '36px Arial';
+      ctx.fillStyle = '#ffffff'; // Couleur du texte
+      ctx.fillText('Bienvenue dans le royaume d\'Hyrule', avatarSize + 20, backgroundImage.height / 2 + 10);
 
-      // Créer l'image finale en superposant l'avatar sur l'arrière-plan
-      const finalImage = await sharp(background)
-        .composite([{
-          input: avatar,
-          top: 150, // Position verticale de l'avatar sur l'image
-          left: 100, // Position horizontale
-          raw: { width: 200, height: 200 }, // Dimensions de l'avatar
-        }])
-        .png() // Exporter en PNG
-        .toBuffer(); // Convertir en buffer
+      // Sauvegarder l'image générée
+      const outputImagePath = './output-image.png';
+      const outputBuffer = canvas.toBuffer();
+      fs.writeFileSync(outputImagePath, outputBuffer);
 
-      // Création de l'embed de bienvenue
+      // Création de l'embed
       const welcomeEmbed = new EmbedBuilder()
         .setColor("#f500c0")
-        .setTitle(`Bienvenue sur notre serveur d'ob ${member.user.username}!`)
-        .setDescription("Ici tu trouveras :\n • des concours\n • un super bot qui te donne les prérequis pour les prestiges\n • un salon de commerce\n • toutes les actualités de l'ob")
-        .setImage('attachment://welcome-image.png') // Lien de l'image générée attachée à l'embed
+        .setTitle(`Bienvenue sur notre serveur d'OB ${member.user.username} !`)
+        .setDescription("Ici tu trouveras :\n • des concours\n • un super bot qui te donne les prérequis pour les prestiges\n • un salon de commerce\n • toutes les actualités de l'OB")
+        .setImage('attachment://output-image.png')
         .setTimestamp();
 
-      // Attacher l'image générée à l'embed
-      const attachment = new AttachmentBuilder(finalImage, { name: 'welcome-image.png' });
+      // Envoie l'embed avec l'image dans le canal de bienvenue
+      const channel = member.guild.channels.cache.get('1348227800355569707'); // ID du canal
+      if (channel) {
+        await channel.send({ embeds: [welcomeEmbed], files: [{ attachment: outputImagePath, name: 'output-image.png' }] });
+      } else {
+        console.error("Canal introuvable !");
+      }
 
-      // Envoie de l'embed avec l'image dans le DM du membre
-      await member.send({ embeds: [welcomeEmbed], files: [attachment] });
+      // Envoie un message privé avec l'embed
+      try {
+        await member.send({ embeds: [welcomeEmbed], files: [{ attachment: outputImagePath, name: 'output-image.png' }] });
+      } catch (error) {
+        console.error("Impossible d'envoyer un DM à l'utilisateur :", error);
+      }
+
+      // Supprime les fichiers temporaires
+      fs.unlinkSync(backgroundFilePath);
+      fs.unlinkSync(avatarFilePath);
+      fs.unlinkSync(outputImagePath);
 
     } catch (error) {
-      console.error("Erreur lors de l'envoi du message de bienvenue:", error);
-    }
-
-    // Création de l'embed d'annonce dans un canal public
-    const secondEmbed = new EmbedBuilder()
-      .setColor("#f500c0")
-      .setTitle(`${member.user.username} a rejoint le serveur !`)
-      .setDescription(`Que tout le monde dise bonjour à ${member.user.toString()} !`)
-      .setThumbnail(member.user.displayAvatarURL())
-      .setTimestamp();
-
-    // Envoie l'embed dans le canal de bienvenue
-    const channel = member.guild.channels.cache.get('1348227800355569707'); // ID du canal
-    if (channel) {
-      await channel.send({ embeds: [secondEmbed] });
-    } else {
-      console.error("Canal introuvable !");
+      console.error("Erreur lors de la création ou de l'envoi de l'embed :", error);
     }
   });
 };
