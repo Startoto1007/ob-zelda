@@ -9,6 +9,6 @@
   "dependencies": {
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
-    "canvas": "^2.11.2"  // Ajoute ceci pour remplacer @napi-rs/canvas
+    "canvas": "^2.11.2"  // Ajoute cette dépendance si elle n'est pas présente
   }
 }
