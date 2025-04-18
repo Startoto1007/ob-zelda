@@ -5,14 +5,10 @@ export default (client) => {
   client.on('guildMemberAdd', async (member) => {
     // Création de l'embed de bienvenue pour le membre
     const welcomeEmbed = new EmbedBuilder()
-      .setColor('#00FF00')
-      .setTitle('Bienvenue sur le serveur !')
-      .setDescription('Nous sommes heureux de t’accueillir sur notre serveur ! N’oublie pas de consulter les règles et de t’amuser !')
-      .setThumbnail(member.user.displayAvatarURL())
-      .addFields({
-        name: 'Règles',
-        value: 'N’oublie pas de lire les règles et de respecter les autres membres.',
-      })
+      .setColor("#f500c0")
+      .setTitle(`Bienvenue sur notre serveur d'ob ${member.user.username} !`)
+      .setDescription("Ici tu trouveras :\n • des concours\n • un super bot qui te donne les prérequis pour les prestiges\n • un salon de commerce\n • toutes les actualités de l'ob")
+      .setImage("https://i.imgur.com/4ug9AH9.jpeg")
       .setTimestamp();
 
     // Envoie le message dans un canal principal
