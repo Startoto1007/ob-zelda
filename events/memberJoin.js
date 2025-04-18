@@ -1,60 +1,77 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
-import path from 'path';
+import Canvas from '@napi-rs/canvas';
+import fetch from 'node-fetch';
 
 export default (client) => {
   client.on('guildMemberAdd', async (member) => {
     try {
-      // 🎨 Configuration du canvas
-      const width = 1280;
-      const height = 640;
-      const canvas = createCanvas(width, height);
+      // Récupère l'avatar de l'utilisateur
+      const avatarURL = member.user.displayAvatarURL({ extension: 'png', size: 512 });
+      const avatarResponse = await fetch(avatarURL);
+      const avatarBuffer = await avatarResponse.arrayBuffer();
+
+      // Charge l’arrière-plan
+      const backgroundResponse = await fetch('https://i.imgur.com/JnSa4Eh.jpeg');
+      const backgroundBuffer = await backgroundResponse.arrayBuffer();
+
+      // Création du canvas
+      const canvas = Canvas.createCanvas(800, 300);
       const ctx = canvas.getContext('2d');
 
-      // 🔲 Image d'arrière-plan + flou très léger
-      const background = await loadImage('https://i.imgur.com/JnSa4Eh.jpeg');
-      ctx.drawImage(background, 0, 0, width, height);
+      // Ajoute l’arrière-plan flouté
+      const background = await Canvas.loadImage(Buffer.from(backgroundBuffer));
+      ctx.filter = 'blur(2px)';
+      ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+      ctx.filter = 'none';
 
-      // Simuler un flou très léger en superposant plusieurs couches transparentes
-      ctx.globalAlpha = 0.2;
-      for (let i = 0; i < 4; i++) {
-        ctx.drawImage(canvas, 0, 0, width, height);
-      }
-      ctx.globalAlpha = 1;
+      // Dessine l’avatar avec un cercle et une bordure
+      const avatar = await Canvas.loadImage(Buffer.from(avatarBuffer));
+      const avatarX = 40;
+      const avatarY = 40;
+      const avatarRadius = 100;
 
-      // 👤 Avatar avec bordure ronde
-      const avatarSize = 250;
-      const avatarX = width / 2 - avatarSize / 2;
-      const avatarY = 160;
-
-      // Cercle de bordure
+      // Bordure
       ctx.beginPath();
-      ctx.arc(width / 2, avatarY + avatarSize / 2, avatarSize / 2 + 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.arc(avatarX + avatarRadius, avatarY + avatarRadius, avatarRadius + 5, 0, Math.PI * 2, true);
+      ctx.fillStyle = '#f500c0';
       ctx.fill();
-      ctx.closePath();
 
       // Avatar
-      const avatar = await loadImage(member.user.displayAvatarURL({ extension: 'png', size: 512 }));
       ctx.save();
       ctx.beginPath();
-      ctx.arc(width / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+      ctx.arc(avatarX + avatarRadius, avatarY + avatarRadius, avatarRadius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.clip();
-      ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
+      ctx.drawImage(avatar, avatarX, avatarY, avatarRadius * 2, avatarRadius * 2);
       ctx.restore();
 
-      // ✍️ Texte
+      // Texte
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 50px Sans';
-      ctx.textAlign = 'center';
-      ctx.fillText(`Bienvenue ${member.user.username} !`, width / 2, 500);
+      ctx.font = '32px "Serif"'; // à remplacer si tu veux une vraie police Zelda personnalisée
+      ctx.fillText('Bienvenue dans', 280, 120);
+      ctx.fillText('le royaume d\'Hyrule', 280, 170);
 
-      // 🖼️ Génération de l'image finale
-      const buffer = canvas.toBuffer('image/png');
-      const attachment = new AttachmentBuilder(buffer, { name: 'welcome-image.png' });
+      // Prépare l’image finale
+      const buffer = await canvas.encode('png');
+      const attachment = new AttachmentBuilder(buffer, { name: 'bienvenue.png' });
 
-      // 📬 Embed en DM
+      // Embed à envoyer dans le salon
+      const embed = new EmbedBuilder()
+        .setColor("#f500c0")
+        .setTitle(`${member.user.username} a rejoint le serveur !`)
+        .setDescription(`Que tout le monde dise bonjour à ${member.user.toString()} !`)
+        .setImage('attachment://bienvenue.png')
+        .setTimestamp();
+
+      // Envoie le message dans le salon
+      const channel = member.guild.channels.cache.get('1348227800355569707');
+      if (channel) {
+        await channel.send({ embeds: [embed], files: [attachment] });
+      } else {
+        console.error("Canal introuvable !");
+      }
+
+      // DM de bienvenue
       const welcomeEmbed = new EmbedBuilder()
         .setColor("#f500c0")
         .setTitle(`Bienvenue sur notre serveur d'ob ${member.user.username} !`)
@@ -68,22 +85,8 @@ export default (client) => {
         console.error("Impossible d'envoyer un DM à l'utilisateur :", error);
       }
 
-      // 📢 Embed public avec image personnalisée
-      const publicEmbed = new EmbedBuilder()
-        .setColor("#f500c0")
-        .setTitle(`${member.user.username} a rejoint le serveur !`)
-        .setDescription(`Que tout le monde dise bonjour à ${member.user.toString()} !`)
-        .setImage('attachment://welcome-image.png')
-        .setTimestamp();
-
-      const channel = member.guild.channels.cache.get('1348227800355569707');
-      if (channel) {
-        await channel.send({ embeds: [publicEmbed], files: [attachment] });
-      } else {
-        console.error("Canal introuvable !");
-      }
     } catch (error) {
-      console.error("Erreur lors de l’envoi de l’image de bienvenue :", error);
+      console.error("Erreur lors de l'envoi des embeds :", error);
     }
   });
 };
