@@ -8,7 +8,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     console.log('🔄 Suppression des anciennes commandes (globales)...');
 
     const commands = await rest.put(
-      Routes.applicationCommands('TON_CLIENT_ID'),
+      Routes.applicationCommands('1357762980497981731'),
       { body: [] },
     );
 
