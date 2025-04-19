@@ -2,7 +2,7 @@
   "name": "ob-zelda-bot",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",  // Cette ligne est nécessaire pour utiliser les importations ESM
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
