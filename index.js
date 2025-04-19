@@ -1,35 +1,27 @@
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
-import fs from 'fs';
-import path from 'path';
+import { Client, GatewayIntentBits } from 'discord.js';
+import dotenv from 'dotenv';
 
+// Charger les variables d'environnement
+dotenv.config();
+
+// Créer une instance du bot
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.DirectMessages
+    GatewayIntentBits.MessageContent
   ]
 });
 
-client.commands = new Collection();
-
-// 🔁 Chargement dynamique des events depuis le dossier "events"
-const eventsPath = path.resolve('./events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-  const filePath = path.join(eventsPath, file);
-  const event = (await import(filePath)).default;
-  event(client);
-}
-
-// ✅ Le bot est prêt
+// L'événement 'ready' qui se déclenche lorsque le bot est en ligne
 client.once('ready', () => {
-  console.log(`✅ Bot en ligne : ${client.user.tag}`);
-
-  // 🟣 Statut visible sur Discord
-  client.user.setActivity("Créé par l'OB Zelda", { type: 2 }); // Type 2 = Listening
+  console.log(`${client.user.tag} est maintenant en ligne !`);
+  client.user.setStatus('en ligne');  // Statut du bot
+  client.user.setActivity('Créé par l\'OB Zelda', { type: 'PLAYING' });
 });
 
-client.login(process.env.DISCORD_TOKEN);
+// L'événement 'guildMemberAdd' qui se déclenche lorsqu'un membre rejoint le serveur
+import memberJoin from './events/memberJoin.js';
+memberJoin(client);
+
+client.login(process.env.DISCORD_TOKEN);  // Utilisation du token depuis les variables d'environnement
