@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes, Collection } from 'discord.js';  // Ajouter Collection ici
 import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -22,7 +22,7 @@ const client = new Client({
   ]
 });
 
-client.commands = new Collection();
+client.commands = new Collection();  // Maintenant, Collection est défini
 
 // Charger toutes les commandes
 const commandsPath = path.join(__dirname, 'commands');
