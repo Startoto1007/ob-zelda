@@ -1,54 +1,32 @@
 import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import { config } from 'dotenv';
-import { createRequire } from 'module';
+import { deployCommands } from './deploy-commands.js';
+import memberJoins from './events/memberJoins.js';  // Importer le fichier d'événement
 
-// Chargement des variables d'environnement
-config();
+config(); // Charger les variables d'environnement
 
-const require = createRequire(import.meta.url);
-
-// Création du client Discord
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMessages
+    GatewayIntentBits.GuildMembers
   ]
 });
 
-// Importer les commandes
-import { commands as prestigeCommands } from './commands/prestiges.js';
-
-// Initialiser les collections de commandes
 client.commands = new Collection();
 
-// Ajouter les commandes à la collection
-client.commands.set(prestigeCommands.data.name, prestigeCommands);
+// Charger les commandes
+import { commands } from './commands/index.js'; // Assurez-vous d'importer toutes les commandes
+commands.forEach(command => {
+  client.commands.set(command.data.name, command);
+});
 
-// Charger les événements
-import memberJoins from './events/memberJoins.js';
-memberJoins(client); // Assure-toi que l'événement guildMemberAdd fonctionne
+// Gestion de l'événement 'guildMemberAdd'
+memberJoins(client);  // S'assurer que l'événement 'memberJoin' est bien géré
 
-// Quand le client est prêt
 client.once('ready', () => {
-  console.log(`${client.user.tag} est prêt !`);
+  console.log(`Bot connecté en tant que ${client.user.tag}`);
 });
 
-// Commandes : gérer les interactions
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
-
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
-
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({ content: 'Il y a eu une erreur en exécutant cette commande.', ephemeral: true });
-  }
-});
-
-// Connexion avec le token du bot
-client.login(process.env.TOKEN);
+client.login(process.env.DISCORD_TOKEN);
