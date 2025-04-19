@@ -1,34 +1,35 @@
 import { Client, GatewayIntentBits, Collection } from 'discord.js';
-import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.DirectMessages,
-  ],
+    GatewayIntentBits.DirectMessages
+  ]
 });
 
 client.commands = new Collection();
 
-// 📂 Chargement des events (comme guildMemberAdd)
+// 🔁 Chargement dynamique des events depuis le dossier "events"
 const eventsPath = path.resolve('./events');
-fs.readdirSync(eventsPath).forEach(file => {
-  const event = await import(`./events/${file}`);
-  event.default(client);
-});
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
+for (const file of eventFiles) {
+  const filePath = path.join(eventsPath, file);
+  const event = (await import(filePath)).default;
+  event(client);
+}
+
+// ✅ Le bot est prêt
 client.once('ready', () => {
   console.log(`✅ Bot en ligne : ${client.user.tag}`);
 
-  // 👇 Mise à jour du statut
-  client.user.setActivity('Créé par l\'OB Zelda', {
-    type: 3, // WATCHING
-  });
+  // 🟣 Statut visible sur Discord
+  client.user.setActivity("Créé par l'OB Zelda", { type: 2 }); // Type 2 = Listening
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.DISCORD_TOKEN);
