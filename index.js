@@ -1,95 +1,54 @@
-import { Client, GatewayIntentBits, REST, Routes, Collection } from 'discord.js';  // Ajouter Collection ici
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import { config } from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
-// Charger les variables d'environnement
+// Chargement des variables d'environnement
 config();
 
-// Récupérer le chemin du fichier et du répertoire
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const require = createRequire(import.meta.url);
 
-// Créer une instance de client Discord
-const client = new Client({ 
+// Création du client Discord
+const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessages
   ]
 });
 
-client.commands = new Collection();  // Maintenant, Collection est défini
+// Importer les commandes
+import { commands as prestigeCommands } from './commands/prestiges.js';
 
-// Charger toutes les commandes
-const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+// Initialiser les collections de commandes
+client.commands = new Collection();
 
-for (const file of commandFiles) {
-  const filePath = path.join(commandsPath, file);
-  const command = await import(`./commands/${file}`);
-  if ('data' in command && 'execute' in command) {
-    client.commands.set(command.data.name, command);
-  } else {
-    console.warn(`[AVERTISSEMENT] La commande ${file} est invalide.`);
-  }
-}
+// Ajouter les commandes à la collection
+client.commands.set(prestigeCommands.data.name, prestigeCommands);
 
-// Lancer le bot
-client.once('ready', async () => {
-  console.log(`Connecté en tant que ${client.user.tag}`);
-  
-  // Définir le statut d'activité
-  client.user.setActivity("Créé par l'OB Zelda", { type: 2 });
+// Charger les événements
+import memberJoins from './events/memberJoins.js';
+memberJoins(client); // Assure-toi que l'événement guildMemberAdd fonctionne
 
-  // Nettoyer les anciennes commandes
-  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
-  try {
-    const applicationId = client.user.id;
-    await rest.put(
-      Routes.applicationCommands(applicationId),
-      { body: [] } // Vide = suppression de toutes les commandes globales
-    );
-    console.log('Toutes les anciennes commandes ont été supprimées !');
-  } catch (error) {
-    console.error('Erreur lors de la suppression des commandes :', error);
-  }
-
-  // Réenregistrer les nouvelles commandes
-  const commands = [];
-  for (const command of client.commands.values()) {
-    commands.push(command.data.toJSON());
-  }
-
-  try {
-    await rest.put(
-      Routes.applicationCommands(client.user.id),
-      { body: commands }
-    );
-    console.log('Commandes mises à jour avec succès !');
-  } catch (error) {
-    console.error('Erreur lors de l’enregistrement des commandes :', error);
-  }
+// Quand le client est prêt
+client.once('ready', () => {
+  console.log(`${client.user.tag} est prêt !`);
 });
 
-// Gérer les interactions
+// Commandes : gérer les interactions
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
   const command = client.commands.get(interaction.commandName);
-
   if (!command) return;
 
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error('Erreur lors de l’exécution de la commande:', error);
-    await interaction.reply({ content: 'Désolé, une erreur est survenue!', ephemeral: true });
+    console.error(error);
+    await interaction.reply({ content: 'Il y a eu une erreur en exécutant cette commande.', ephemeral: true });
   }
 });
 
-// Se connecter au bot
-client.login(process.env.DISCORD_TOKEN);
+// Connexion avec le token du bot
+client.login(process.env.TOKEN);
