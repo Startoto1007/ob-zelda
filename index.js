@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
-import memberJoins from './events/memberJoins.js'; // Événement de bienvenue
+import memberJoin from './events/memberJoin.js'; // Événement de bienvenue (correction du nom)
 
 const client = new Client({
   intents: [
@@ -15,20 +15,17 @@ const client = new Client({
 // Quand le bot est prêt, on enregistre les commandes
 client.once('ready', async () => {
   console.log(`Bot connecté en tant que ${client.user.tag}`);
-
   // Enregistrer les commandes globalement
   await client.application.commands.set([prestigeCommand]);
-
   console.log('Commandes enregistrées!');
 });
 
-// Événement quand un membre rejoint le serveur
-client.on('guildMemberAdd', memberJoins);
+// Initialiser l'événement de bienvenue
+memberJoin(client);
 
 // Exécution des commandes (ici, pour /prestige)
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
-
   if (interaction.commandName === 'prestige') {
     await prestigeExecute(interaction);
   }
