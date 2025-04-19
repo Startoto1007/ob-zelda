@@ -1,27 +1,64 @@
-import { Client, GatewayIntentBits } from 'discord.js';
-import dotenv from 'dotenv';
+import { Client, GatewayIntentBits, Collection, ActivityType } from 'discord.js';
+import { config } from 'dotenv';
+import fs from 'node:fs';
+import path from 'node:path';
 
-// Charger les variables d'environnement
-dotenv.config();
+config();
 
-// Créer une instance du bot
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.DirectMessages
   ]
 });
 
-// L'événement 'ready' qui se déclenche lorsque le bot est en ligne
-client.once('ready', () => {
-  console.log(`${client.user.tag} est maintenant en ligne !`);
-  client.user.setStatus('en ligne');  // Statut du bot
-  client.user.setActivity('Créé par l\'OB Zelda', { type: 'PLAYING' });
+// Commandes
+client.commands = new Collection();
+const commandsPath = path.join(process.cwd(), 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = await import(`file://${filePath}`);
+  if ('data' in command && 'execute' in command) {
+    client.commands.set(command.data.name, command);
+  } else {
+    console.warn(`[AVERTISSEMENT] La commande à ${filePath} est invalide.`);
+  }
+}
+
+// Listener d'interactions (slash commands)
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: 'Une erreur est survenue !', ephemeral: true });
+  }
 });
 
-// L'événement 'guildMemberAdd' qui se déclenche lorsqu'un membre rejoint le serveur
-import memberJoin from './events/memberJoin.js';
-memberJoin(client);
+// Événements
+const eventsPath = path.join(process.cwd(), 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-client.login(process.env.DISCORD_TOKEN);  // Utilisation du token depuis les variables d'environnement
+for (const file of eventFiles) {
+  const filePath = path.join(eventsPath, file);
+  const event = (await import(`file://${filePath}`)).default;
+  event(client);
+}
+
+// Quand le bot est prêt
+client.once('ready', () => {
+  console.log(`Connecté en tant que ${client.user.tag}`);
+  client.user.setActivity('Créé par l’OB Zelda', { type: ActivityType.Listening });
+});
+
+client.login(process.env.DISCORD_TOKEN);
