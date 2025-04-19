@@ -2,7 +2,7 @@ import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import { config } from 'dotenv';
 import memberJoins from './events/memberJoins.js';  // Import de l'événement
 
-config();  // Charge les variables d'environnement du fichier .env
+config();  // Charger les variables d'environnement
 
 const client = new Client({
   intents: [
@@ -15,7 +15,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
-// Charger les commandes
+// Charger les commandes depuis le dossier "commands"
 import { readdirSync } from 'fs';
 const commandFiles = readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -24,7 +24,7 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command);
 }
 
-// Event guildMemberAdd (bienvenue)
+// Événements personnalisés
 memberJoins(client);
 
 client.on('ready', () => {
@@ -45,4 +45,4 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);  // Connexion du bot avec le token de l'environnement
+client.login(process.env.DISCORD_TOKEN);  // Connexion à Discord avec le token
