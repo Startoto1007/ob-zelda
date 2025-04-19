@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "Bot officiel de l'OB Zelda",
   "main": "index.js",
-  "type": "module",
+  "dependencies": {
+    "discord.js": "^14.0.0",
+    "@napi-rs/canvas": "^2.0.0",
+    "dotenv": "^16.0.0"
+  },
   "scripts": {
     "start": "node index.js"
   },
-  "dependencies": {
-    "discord.js": "^14.14.1",
-    "dotenv": "^16.4.5"
-  }
+  "author": "OB Zelda",
+  "license": "ISC"
 }
