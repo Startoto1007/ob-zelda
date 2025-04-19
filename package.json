@@ -15,5 +15,6 @@
     "node": "18.x"
   },
   "author": "OB Zelda",
-  "license": "MIT"
+  "license": "MIT",
+  "type": "module"  // Ajoute cette ligne pour activer les modules ES6
 }
