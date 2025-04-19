@@ -87,6 +87,5 @@ export async function execute(interaction) {
       .setDescription(`Tu as choisi le prestige ${type} ${niveau}, mais je n’ai pas encore les infos pour celui-là. (ou alors j'ai eu la flemme de l'ajouter ^^)`);
   }
 
-  // Retirer l'option "ephemeral: true" pour que l'embed soit visible par tous
   await interaction.reply({ embeds: [embed] });
 }
