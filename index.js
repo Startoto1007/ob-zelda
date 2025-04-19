@@ -1,64 +1,95 @@
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import 'dotenv/config';
 
+// Charger les variables d'environnement
+config();
+
+// Récupérer le chemin du fichier et du répertoire
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Création du client Discord
-const client = new Client({
+// Créer une instance de client Discord
+const client = new Client({ 
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.DirectMessages
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions,
   ]
 });
 
-// Set du statut d'activité
-client.once('ready', () => {
-  console.log(`✅ Connecté en tant que ${client.user.tag}`);
-  client.user.setActivity('Créé par l\'OB Zelda', { type: 2 });
-});
-
-// Chargement des événements
-const eventsPath = path.join(__dirname, 'events');
-fs.readdirSync(eventsPath).forEach(file => {
-  if (file.endsWith('.js')) {
-    import(path.join(eventsPath, file)).then(module => {
-      if (typeof module.default === 'function') module.default(client);
-    });
-  }
-});
-
-// Chargement des commandes
 client.commands = new Collection();
+
+// Charger toutes les commandes
 const commandsPath = path.join(__dirname, 'commands');
-fs.readdirSync(commandsPath).forEach(file => {
-  if (file.endsWith('.js')) {
-    import(path.join(commandsPath, file)).then(command => {
-      if (command.default?.data && command.default?.execute) {
-        client.commands.set(command.default.data.name, command.default);
-      }
-    });
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = await import(`./commands/${file}`);
+  if ('data' in command && 'execute' in command) {
+    client.commands.set(command.data.name, command);
+  } else {
+    console.warn(`[AVERTISSEMENT] La commande ${file} est invalide.`);
+  }
+}
+
+// Lancer le bot
+client.once('ready', async () => {
+  console.log(`Connecté en tant que ${client.user.tag}`);
+  
+  // Définir le statut d'activité
+  client.user.setActivity("Créé par l'OB Zelda", { type: 2 });
+
+  // Nettoyer les anciennes commandes
+  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+  try {
+    const applicationId = client.user.id;
+    await rest.put(
+      Routes.applicationCommands(applicationId),
+      { body: [] } // Vide = suppression de toutes les commandes globales
+    );
+    console.log('Toutes les anciennes commandes ont été supprimées !');
+  } catch (error) {
+    console.error('Erreur lors de la suppression des commandes :', error);
+  }
+
+  // Réenregistrer les nouvelles commandes
+  const commands = [];
+  for (const command of client.commands.values()) {
+    commands.push(command.data.toJSON());
+  }
+
+  try {
+    await rest.put(
+      Routes.applicationCommands(client.user.id),
+      { body: commands }
+    );
+    console.log('Commandes mises à jour avec succès !');
+  } catch (error) {
+    console.error('Erreur lors de l’enregistrement des commandes :', error);
   }
 });
 
-// Interaction handler
-client.on('interactionCreate', async interaction => {
-  if (!interaction.isChatInputCommand()) return;
+// Gérer les interactions
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+
   const command = client.commands.get(interaction.commandName);
+
   if (!command) return;
+
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error(error);
-    await interaction.reply({ content: 'Une erreur est survenue.', ephemeral: true });
+    console.error('Erreur lors de l’exécution de la commande:', error);
+    await interaction.reply({ content: 'Désolé, une erreur est survenue!', ephemeral: true });
   }
 });
 
-// Connexion
+// Se connecter au bot
 client.login(process.env.DISCORD_TOKEN);
