@@ -1,10 +1,13 @@
-import { Client, GatewayIntentBits, Collection, ActivityType } from 'discord.js';
-import { config } from 'dotenv';
-import fs from 'node:fs';
-import path from 'node:path';
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
 
-config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Création du client Discord
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -15,50 +18,47 @@ const client = new Client({
   ]
 });
 
-// Commandes
-client.commands = new Collection();
-const commandsPath = path.join(process.cwd(), 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+// Set du statut d'activité
+client.once('ready', () => {
+  console.log(`✅ Connecté en tant que ${client.user.tag}`);
+  client.user.setActivity('Créé par l\'OB Zelda', { type: 2 });
+});
 
-for (const file of commandFiles) {
-  const filePath = path.join(commandsPath, file);
-  const command = await import(`file://${filePath}`);
-  if ('data' in command && 'execute' in command) {
-    client.commands.set(command.data.name, command);
-  } else {
-    console.warn(`[AVERTISSEMENT] La commande à ${filePath} est invalide.`);
+// Chargement des événements
+const eventsPath = path.join(__dirname, 'events');
+fs.readdirSync(eventsPath).forEach(file => {
+  if (file.endsWith('.js')) {
+    import(path.join(eventsPath, file)).then(module => {
+      if (typeof module.default === 'function') module.default(client);
+    });
   }
-}
+});
 
-// Listener d'interactions (slash commands)
+// Chargement des commandes
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+fs.readdirSync(commandsPath).forEach(file => {
+  if (file.endsWith('.js')) {
+    import(path.join(commandsPath, file)).then(command => {
+      if (command.default?.data && command.default?.execute) {
+        client.commands.set(command.default.data.name, command.default);
+      }
+    });
+  }
+});
+
+// Interaction handler
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
-
   const command = client.commands.get(interaction.commandName);
   if (!command) return;
-
   try {
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
-    await interaction.reply({ content: 'Une erreur est survenue !', ephemeral: true });
+    await interaction.reply({ content: 'Une erreur est survenue.', ephemeral: true });
   }
 });
 
-// Événements
-const eventsPath = path.join(process.cwd(), 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-  const filePath = path.join(eventsPath, file);
-  const event = (await import(`file://${filePath}`)).default;
-  event(client);
-}
-
-// Quand le bot est prêt
-client.once('ready', () => {
-  console.log(`Connecté en tant que ${client.user.tag}`);
-  client.user.setActivity('Créé par l’OB Zelda', { type: ActivityType.Listening });
-});
-
+// Connexion
 client.login(process.env.DISCORD_TOKEN);
