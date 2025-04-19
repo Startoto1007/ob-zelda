@@ -1,5 +1,5 @@
 import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
-import { createCanvas, loadImage } from 'canvas'; // ✅ bon import
+import { createCanvas, loadImage } from 'canvas';
 
 export default (client) => {
   client.on('guildMemberAdd', async (member) => {
@@ -34,7 +34,7 @@ export default (client) => {
       // Embed en DM
       const welcomeEmbed = new EmbedBuilder()
         .setColor("#f500c0")
-        .setTitle(`Bienvenue sur notre serveur d'ob ${member.user.username} !`)
+        .setTitle(`Bienvenue sur notre serveur, ${member.user.username} !`)
         .setDescription("Ici tu trouveras :\n • des concours\n • un super bot qui te donne les prérequis pour les prestiges\n • un salon de commerce\n • toutes les actualités de l'ob")
         .setImage("https://i.imgur.com/4ug9AH9.jpeg")
         .setTimestamp();
@@ -45,6 +45,7 @@ export default (client) => {
         console.error("Impossible d'envoyer un DM à l'utilisateur :", error);
       }
 
+      // Envoi de l'image dans le canal
       const channel = member.guild.channels.cache.get("1348227800355569707");
       if (channel) {
         await channel.send({
