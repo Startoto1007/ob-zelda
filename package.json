@@ -16,5 +16,5 @@
   },
   "author": "OB Zelda",
   "license": "MIT",
-  "type": "module"  // Ajoute cette ligne pour activer les modules ES6
+  "type": "module"
 }
