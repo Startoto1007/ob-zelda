@@ -62,17 +62,17 @@ export async function execute(interaction) {
       .setDescription('• Argent : 10M\n• Vote : 20x\n• One-Block : 2,5k blocs minés\n• Grimoires commun : 100\n• Grimoires rare : 10\n• Playtime : 6h\n• Items jetés dans la fontaine : 10\n• Mine : 2,5k blocs minés\n• Points joueurs : 7,5k\n• Daily : 15x\n• Agriculteur : niv11\n• Mineur : niv4');
   } else if (type === 'or' && niveau === 1) {
     embed = new EmbedBuilder()
-      .setColor('#FD700')
+      .setColor('#c99028')
       .setTitle('Prestige Or I')
       .setDescription('• Argent : 15M\n• Vote : 25x\n• One-Block : 3,5k blocs minés\n• Grimoires commun : 150\n• Grimoires rare : 20\n• Playtime : 10h\n• Items jetés dans la fontaine : 20\n• Mine : 5k blocs minés\n• Points joueurs : 10k\n• Daily : 20x\n• Agriculteur : niv13\n• Mineur : niv6');
   } else if (type === 'or' && niveau === 2) {
     embed = new EmbedBuilder()
-      .setColor('#FFD700')
+      .setColor('#c99028')
       .setTitle('Prestige Or II')
       .setDescription('• Argent : 20M\n• Vote : 35x\n• One-Block : 4,5k blocs minés\n• Grimoires commun : 250\n• Grimoires rare : 35\n• Grimoires épique : 3\n• Playtime : 16h\n• Items jetés dans la fontaine : 30\n• Mine : 8k blocs minés\n• Points joueurs : 25k\n• Daily : 25x\n• Agriculteur : niv16\n• Mineur : niv9\n• Bûcheron : niv2');
   } else if (type === 'or' && niveau === 3) {
     embed = new EmbedBuilder()
-      .setColor('#FFD700')
+      .setColor('#c99028')
       .setTitle('Prestige Or III')
       .setDescription('• Argent : 30M\n• Vote : 50x\n• One-Block : 7k blocs minés\n• Grimoires commun : 400\n• Grimoires rare : 50\n• Grimoires épique : 10\n• Playtime : 24h\n• Items jetés dans la fontaine : 40\n• Mine : 12,5k blocs minés\n• Points joueurs : 35k\n• Daily : 35x\n• Agriculteur : niv19\n• Mineur : niv11\n• Bûcheron : niv4');
   } else if (type === 'crystal' && niveau === 1) {
