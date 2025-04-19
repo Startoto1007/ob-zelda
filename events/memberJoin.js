@@ -9,7 +9,7 @@ export default (client) => {
       const canvas = createCanvas(width, height);
       const ctx = canvas.getContext('2d');
 
-      // Chargement de l'image de fond avec texte intégré
+      // Chargement de l'image de fond
       const background = await loadImage("https://res.cloudinary.com/dor9octmp/image/upload/v1745054283/Capture_d_e%CC%81cran_2025-04-19_a%CC%80_11.12.48_pclp9y.png");
       ctx.drawImage(background, 0, 0, width, height);
 
@@ -45,7 +45,6 @@ export default (client) => {
         console.error("Impossible d'envoyer un DM à l'utilisateur :", error);
       }
 
-      // Envoi de l'image dans le canal
       const channel = member.guild.channels.cache.get("1348227800355569707");
       if (channel) {
         await channel.send({
