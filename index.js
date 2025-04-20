@@ -1,7 +1,7 @@
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
-import memberJoin from './events/memberJoin.js'; // Événement de bienvenue (correction du nom)
+import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 
 const client = new Client({
   intents: [
@@ -12,9 +12,13 @@ const client = new Client({
   ],
 });
 
-// Quand le bot est prêt, on enregistre les commandes
+// Quand le bot est prêt, on enregistre les commandes et définit le statut
 client.once('ready', async () => {
   console.log(`Bot connecté en tant que ${client.user.tag}`);
+  
+  // Définir le statut d'activité
+  client.user.setActivity('Créé par l\'OB Zelda', { type: ActivityType.Listening });
+  
   // Enregistrer les commandes globalement
   await client.application.commands.set([prestigeCommand]);
   console.log('Commandes enregistrées!');
