@@ -12,7 +12,8 @@ export const data = new SlashCommandBuilder()
         { name: 'Argent', value: 'argent' },
         { name: 'Or', value: 'or' },
         { name: 'Crystal', value: 'crystal' },
-        { name: 'Rubis', value: 'rubis' }
+        { name: 'Rubis', value: 'rubis' },
+        { name: 'Platine', value: 'platine' }
       ))
   .addIntegerOption(option =>
     option.setName('niveau')
@@ -106,8 +107,26 @@ export async function execute(interaction) {
     embed = new EmbedBuilder()
       .setColor('#a82f24')
       .setTitle('Prestige Rubis I')
-      .setDescription('...')
+      .setDescription('• Argent : 125M\n• Vote : 125x\n• One-Block : 20k blocs minés\n• Grimoires commun : 1000\n• Grimoires rare : 150\n• Grimoires épique : 65\n• Grimoires ultime : 25\n• Playtime : 5j\n• Items jetés dans la fontaine : 140\n• Mine : 21,5k blocs minés\n• Points joueurs : 130k\n• Daily : 100x\n• Agriculteur : niv27\n• Mineur : niv21\n• Bûcheron : niv13\n• Pêcheur : niv6')
       .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137138/Rubis_1_rk2poe.png');
+  } else if (type === 'rubis' && niveau === 2) {
+    embed = new EmbedBuilder()
+      .setColor('#a82f24')
+      .setTitle('Prestige Rubis II')
+      .setDescription('• Argent : 150M\n• Vote : 150x\n• One-Block : 25k blocs minés\n• Grimoires commun : 1250\n• Grimoires rare : 175\n• Grimoires épique : 80\n• Grimoires ultime : 30\n• Playtime : 6j\n• Items jetés dans la fontaine : 180\n• Mine : 30k blocs minés\n• Points joueurs : 160k\n• Daily : 150x\n• Agriculteur : niv30\n• Mineur : niv24\n• Bûcheron : niv15\n• Pêcheur : niv9\n• Chasseur : niv2')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137138/Rubis_2_nins8m.png');
+  } else if (type === 'rubis' && niveau === 3) {
+    embed = new EmbedBuilder()
+      .setColor('#a82f24')
+      .setTitle('Prestige Rubis III')
+      .setDescription('• Argent : 150M\n• Vote : 150x\n• One-Block : 30k blocs minés\n• Grimoires commun : 1500\n• Grimoires rare : 200\n• Grimoires épique : 100\n• Grimoires ultime : 40\n• Playtime : 7j\n• Items jetés dans la fontaine : 220\n• Mine : 35k blocs minés\n• Points joueurs : 200k\n• Daily : 140x\n• Agriculteur : niv33\n• Mineur : niv27\n• Bûcheron : niv18\n• Pêcheur : niv11\n• Chasseur : niv4')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137140/Rubis_3_ay39of.png');
+  } else if (type === 'platine' && niveau === 1) {
+    embed = new EmbedBuilder()
+      .setColor('#a82f24')
+      .setTitle('Prestige Platine I')
+      .setDescription('...')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137146/Platine_1_t0fkhk.png');
   } else {
     embed = new EmbedBuilder()
       .setColor('#808080') // couleur grise par défaut pour les autres cas
