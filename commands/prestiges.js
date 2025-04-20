@@ -34,7 +34,8 @@ export async function execute(interaction) {
     embed = new EmbedBuilder()
       .setColor('#cd7f32') // couleur bronze
       .setTitle('Prestige Bronze I')
-      .setDescription('• Argent : 250k\n• Vote : 1x\n• One-Block : 100 blocs minés\n• Grimoires communs : 1\n• Playtime : 15 min');
+      .setDescription('• Argent : 250k\n• Vote : 1x\n• One-Block : 100 blocs minés\n• Grimoires communs : 1\n• Playtime : 15 min')
+      .setImage('https://res.cloudinary.com/dor9octmp/image/upload/c_thumb,w_200,g_face/v1745137095/Bronze_1_ncqoer.png');
   } else if (type === 'bronze' && niveau === 2) {
     embed = new EmbedBuilder()
       .setColor('#cd7f32')
