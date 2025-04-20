@@ -1,7 +1,9 @@
+
 import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
+import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
 
 const client = new Client({
   intents: [
@@ -22,6 +24,9 @@ client.once('ready', async () => {
   // Enregistrer les commandes globalement
   await client.application.commands.set([prestigeCommand]);
   console.log('Commandes enregistrées!');
+  
+  // Initialiser les messages planifiés
+  scheduledMessages(client);
 });
 
 // Initialiser l'événement de bienvenue
