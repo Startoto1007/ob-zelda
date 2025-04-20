@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 export default function setupWebServer(client) {
   const app = express();
-  const PORT = process.env.PORT ? parseInt(process.env.PORT) + 1 : 3001; // Utilise un port différent de celui du bot
+  const PORT = process.env.PORT || 3000;
 
   // Middleware
   app.use(cors());
