@@ -1,9 +1,9 @@
-
 import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
+import setupWebServer from './webServer.js'; // Serveur web
 
 const client = new Client({
   intents: [
@@ -27,6 +27,9 @@ client.once('ready', async () => {
   
   // Initialiser les messages planifiés
   scheduledMessages(client);
+  
+  // Mettre en place le serveur web
+  setupWebServer(client);
 });
 
 // Initialiser l'événement de bienvenue
