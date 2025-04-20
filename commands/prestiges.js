@@ -79,6 +79,21 @@ export async function execute(interaction) {
     embed = new EmbedBuilder()
       .setColor('#9941bc')
       .setTitle('Prestige Crystal I')
+      .setDescription('• Argent : 50M\n• Vote : 65x\n• One-Block : 9k blocs minés\n• Grimoires commun : 500\n• Grimoires rare : 75\n• Grimoires épique : 20\n• Grimoires ultime : 5\n• Playtime : 48h\n• Items jetés dans la fontaine : 50\n• Mine : 12,5k blocs minés\n• Points joueurs : 50k\n• Daily : 50x\n• Agriculteur : niv21\n• Mineur : niv12\n• Bûcheron : niv6');
+  } else if (type === 'crystal' && niveau === 2) {
+    embed = new EmbedBuilder()
+      .setColor('#9941bc')
+      .setTitle('Prestige Crystal II')
+      .setDescription('• Argent : 75M\n• Vote : 80x\n• One-Block : 12,5k blocs minés\n• Grimoires commun : 650\n• Grimoires rare : 100\n• Grimoires épique : 35\n• Grimoires ultime : 10\n• Playtime : 3j\n• Items jetés dans la fontaine : 70\n• Mine : 18k blocs minés\n• Points joueurs : 75k\n• Daily : 85x\n• Agriculteur : niv23\n• Mineur : niv14\n• Bûcheron : niv9\n• Pêcheur : niv2');
+  } else if (type === 'crystal' && niveau === 3) {
+    embed = new EmbedBuilder()
+      .setColor('#9941bc')
+      .setTitle('Prestige Crystal III')
+      .setDescription('• Argent : 100M\n• Vote : 100x\n• One-Block : 15k blocs minés\n• Grimoires commun : 800\n• Grimoires rare : 135\n• Grimoires épique : 50\n• Grimoires ultime : 15\n• Playtime : 4j\n• Items jetés dans la fontaine : 100\n• Mine : 21,5k blocs minés\n• Points joueurs : 100k\n• Daily : 75x\n• Agriculteur : niv25\n• Mineur : niv17\n• Bûcheron : niv11\n• Pêcheur : niv4');
+  } else if (type === 'rubis' && niveau === 1) {
+    embed = new EmbedBuilder()
+      .setColor('#a82f24')
+      .setTitle('Prestige Rubis I')
       .setDescription('...');
   } else {
     embed = new EmbedBuilder()
