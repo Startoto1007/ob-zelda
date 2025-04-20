@@ -27,23 +27,23 @@ export default function setupWebServer(client) {
   app.post('/api/send-embed', async (req, res) => {
     try {
       const { channelId, embedData } = req.body;
-      
+
       // Vérifier que le salon existe
       const channel = await client.channels.fetch(channelId);
       if (!channel) {
         return res.status(404).json({ success: false, message: 'Salon introuvable' });
       }
-      
+
       // Création de l'embed
       const embed = new EmbedBuilder();
-      
+
       // Configurer les propriétés de l'embed
       if (embedData.title) embed.setTitle(embedData.title);
       if (embedData.description) embed.setDescription(embedData.description);
       if (embedData.color) embed.setColor(embedData.color);
       if (embedData.image) embed.setImage(embedData.image);
       if (embedData.thumbnail) embed.setThumbnail(embedData.thumbnail);
-      
+
       // Author
       if (embedData.author && embedData.author.name) {
         embed.setAuthor({
@@ -51,10 +51,10 @@ export default function setupWebServer(client) {
           iconURL: embedData.author.iconURL || null
         });
       }
-      
+
       // Envoyer l'embed
       await channel.send({ embeds: [embed] });
-      
+
       res.json({ success: true, message: 'Embed envoyé avec succès!' });
     } catch (error) {
       console.error('Erreur lors de l\'envoi de l\'embed:', error);
@@ -68,4 +68,4 @@ export default function setupWebServer(client) {
   });
 
   return app;
-}(
+}
