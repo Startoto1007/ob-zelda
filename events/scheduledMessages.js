@@ -3,7 +3,7 @@ import cron from 'node-cron';
 
 export default (client) => {
   // Planification pour chaque mercredi, samedi et dimanche à 7h du matin
-  cron.schedule('48 15 * * 3,6,0', () => {
+  cron.schedule('0 15 * * 3,6,0', () => {
     const channel = client.channels.cache.get('1340250246038683689');
     if (!channel) {
       console.error('Canal pour les messages planifiés introuvable!');
