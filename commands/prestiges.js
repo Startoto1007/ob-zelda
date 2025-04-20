@@ -35,67 +35,79 @@ export async function execute(interaction) {
       .setColor('#cd7f32') // couleur bronze
       .setTitle('Prestige Bronze I')
       .setDescription('• Argent : 250k\n• Vote : 1x\n• One-Block : 100 blocs minés\n• Grimoires communs : 1\n• Playtime : 15 min')
-      .setImage('https://res.cloudinary.com/dor9octmp/image/upload/c_thumb,w_200,g_face/v1745137095/Bronze_1_ncqoer.png');
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/c_thumb,w_200,g_face/v1745137095/Bronze_1_ncqoer.png');
   } else if (type === 'bronze' && niveau === 2) {
     embed = new EmbedBuilder()
       .setColor('#cd7f32')
       .setTitle('Prestige Bronze II')
-      .setDescription('• Argent : 500k\n• Vote : 5x\n• One-Block : 250 blocs minés\n• Grimoires communs : 5\n• Playtime : 30 min');
+      .setDescription('• Argent : 500k\n• Vote : 5x\n• One-Block : 250 blocs minés\n• Grimoires communs : 5\n• Playtime : 30 min')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137095/Bronze_2_fnqtmz.png');
   } else if (type === 'bronze' && niveau === 3) {
     embed = new EmbedBuilder()
       .setColor('#cd7f32')
       .setTitle('Prestige Bronze III')
-      .setDescription('• Argent : 1M\n• Vote : 10x\n• One-Block : 500 blocs minés\n• Grimoires communs : 25\n• Playtime : 60 min\n• Items jetés dans la fontaine : 1\n• Mine : 250 blocs minés\n• Points joueurs : 2,5k\n• Daily : 3x\n• Agriculteur : niv4');
+      .setDescription('• Argent : 1M\n• Vote : 10x\n• One-Block : 500 blocs minés\n• Grimoires communs : 25\n• Playtime : 60 min\n• Items jetés dans la fontaine : 1\n• Mine : 250 blocs minés\n• Points joueurs : 2,5k\n• Daily : 3x\n• Agriculteur : niv4')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137096/Bronze_3_w4ioap.png');
   } else if (type === 'argent' && niveau === 1) {
     embed = new EmbedBuilder()
       .setColor('#b3b3b3')
       .setTitle('Prestige Argent I')
-      .setDescription('• Argent : 2,5M\n• Vote : 10x\n• One-Block : 1k blocs minés\n• Grimoires communs : 50\n• Playtime : 2h\n• Items jetés dans la fontaine : 2\n• Mine : 500 blocs minés\n• Points joueurs : 5k\n• Daily : 5x\n• Agriculteur : niv6');
+      .setDescription('• Argent : 2,5M\n• Vote : 10x\n• One-Block : 1k blocs minés\n• Grimoires communs : 50\n• Playtime : 2h\n• Items jetés dans la fontaine : 2\n• Mine : 500 blocs minés\n• Points joueurs : 5k\n• Daily : 5x\n• Agriculteur : niv6')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137112/Argent_1_fyrpgw.png');
   } else if (type === 'argent' && niveau === 2) {
     embed = new EmbedBuilder()
       .setColor('#b3b3b3')
       .setTitle('Prestige Argent II')
-      .setDescription('• Argent : 5M\n• Vote : 15x\n• One-Block : 1,5k blocs minés\n• Grimoires commun : 75\n• Grimoires rare : 5\n• Playtime : 4h\n• Items jetés dans la fontaine : 5\n• Mine : 1k blocs minés\n• Points joueurs : 7,5k\n• Daily : 10x\n• Agriculteur : niv9\n• Mineur : niv2');
+      .setDescription('• Argent : 5M\n• Vote : 15x\n• One-Block : 1,5k blocs minés\n• Grimoires commun : 75\n• Grimoires rare : 5\n• Playtime : 4h\n• Items jetés dans la fontaine : 5\n• Mine : 1k blocs minés\n• Points joueurs : 7,5k\n• Daily : 10x\n• Agriculteur : niv9\n• Mineur : niv2')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137112/Argent_2_pnencx.png');
   } else if (type === 'argent' && niveau === 3) {
     embed = new EmbedBuilder()
       .setColor('#b3b3b3')
       .setTitle('Prestige Argent III')
-      .setDescription('• Argent : 10M\n• Vote : 20x\n• One-Block : 2,5k blocs minés\n• Grimoires commun : 100\n• Grimoires rare : 10\n• Playtime : 6h\n• Items jetés dans la fontaine : 10\n• Mine : 2,5k blocs minés\n• Points joueurs : 7,5k\n• Daily : 15x\n• Agriculteur : niv11\n• Mineur : niv4');
+      .setDescription('• Argent : 10M\n• Vote : 20x\n• One-Block : 2,5k blocs minés\n• Grimoires commun : 100\n• Grimoires rare : 10\n• Playtime : 6h\n• Items jetés dans la fontaine : 10\n• Mine : 2,5k blocs minés\n• Points joueurs : 7,5k\n• Daily : 15x\n• Agriculteur : niv11\n• Mineur : niv4')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137112/Argent_3_cicasv.png');
   } else if (type === 'or' && niveau === 1) {
     embed = new EmbedBuilder()
       .setColor('#c99028')
       .setTitle('Prestige Or I')
-      .setDescription('• Argent : 15M\n• Vote : 25x\n• One-Block : 3,5k blocs minés\n• Grimoires commun : 150\n• Grimoires rare : 20\n• Playtime : 10h\n• Items jetés dans la fontaine : 20\n• Mine : 5k blocs minés\n• Points joueurs : 10k\n• Daily : 20x\n• Agriculteur : niv13\n• Mineur : niv6');
+      .setDescription('• Argent : 15M\n• Vote : 25x\n• One-Block : 3,5k blocs minés\n• Grimoires commun : 150\n• Grimoires rare : 20\n• Playtime : 10h\n• Items jetés dans la fontaine : 20\n• Mine : 5k blocs minés\n• Points joueurs : 10k\n• Daily : 20x\n• Agriculteur : niv13\n• Mineur : niv6')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137123/Or_1_jlnmwv.png');
   } else if (type === 'or' && niveau === 2) {
     embed = new EmbedBuilder()
       .setColor('#c99028')
       .setTitle('Prestige Or II')
-      .setDescription('• Argent : 20M\n• Vote : 35x\n• One-Block : 4,5k blocs minés\n• Grimoires commun : 250\n• Grimoires rare : 35\n• Grimoires épique : 3\n• Playtime : 16h\n• Items jetés dans la fontaine : 30\n• Mine : 8k blocs minés\n• Points joueurs : 25k\n• Daily : 25x\n• Agriculteur : niv16\n• Mineur : niv9\n• Bûcheron : niv2');
+      .setDescription('• Argent : 20M\n• Vote : 35x\n• One-Block : 4,5k blocs minés\n• Grimoires commun : 250\n• Grimoires rare : 35\n• Grimoires épique : 3\n• Playtime : 16h\n• Items jetés dans la fontaine : 30\n• Mine : 8k blocs minés\n• Points joueurs : 25k\n• Daily : 25x\n• Agriculteur : niv16\n• Mineur : niv9\n• Bûcheron : niv2')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137123/Or_2_uya6ya.png');
   } else if (type === 'or' && niveau === 3) {
     embed = new EmbedBuilder()
       .setColor('#c99028')
       .setTitle('Prestige Or III')
-      .setDescription('• Argent : 30M\n• Vote : 50x\n• One-Block : 7k blocs minés\n• Grimoires commun : 400\n• Grimoires rare : 50\n• Grimoires épique : 10\n• Playtime : 24h\n• Items jetés dans la fontaine : 40\n• Mine : 12,5k blocs minés\n• Points joueurs : 35k\n• Daily : 35x\n• Agriculteur : niv19\n• Mineur : niv11\n• Bûcheron : niv4');
+      .setDescription('• Argent : 30M\n• Vote : 50x\n• One-Block : 7k blocs minés\n• Grimoires commun : 400\n• Grimoires rare : 50\n• Grimoires épique : 10\n• Playtime : 24h\n• Items jetés dans la fontaine : 40\n• Mine : 12,5k blocs minés\n• Points joueurs : 35k\n• Daily : 35x\n• Agriculteur : niv19\n• Mineur : niv11\n• Bûcheron : niv4')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137123/Or_3_qzlhls.png');
   } else if (type === 'crystal' && niveau === 1) {
     embed = new EmbedBuilder()
       .setColor('#9941bc')
       .setTitle('Prestige Crystal I')
-      .setDescription('• Argent : 50M\n• Vote : 65x\n• One-Block : 9k blocs minés\n• Grimoires commun : 500\n• Grimoires rare : 75\n• Grimoires épique : 20\n• Grimoires ultime : 5\n• Playtime : 48h\n• Items jetés dans la fontaine : 50\n• Mine : 12,5k blocs minés\n• Points joueurs : 50k\n• Daily : 50x\n• Agriculteur : niv21\n• Mineur : niv12\n• Bûcheron : niv6');
+      .setDescription('• Argent : 50M\n• Vote : 65x\n• One-Block : 9k blocs minés\n• Grimoires commun : 500\n• Grimoires rare : 75\n• Grimoires épique : 20\n• Grimoires ultime : 5\n• Playtime : 48h\n• Items jetés dans la fontaine : 50\n• Mine : 12,5k blocs minés\n• Points joueurs : 50k\n• Daily : 50x\n• Agriculteur : niv21\n• Mineur : niv12\n• Bûcheron : niv6')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137131/Crystal_1_fbvamr.png');
   } else if (type === 'crystal' && niveau === 2) {
     embed = new EmbedBuilder()
       .setColor('#9941bc')
       .setTitle('Prestige Crystal II')
-      .setDescription('• Argent : 75M\n• Vote : 80x\n• One-Block : 12,5k blocs minés\n• Grimoires commun : 650\n• Grimoires rare : 100\n• Grimoires épique : 35\n• Grimoires ultime : 10\n• Playtime : 3j\n• Items jetés dans la fontaine : 70\n• Mine : 18k blocs minés\n• Points joueurs : 75k\n• Daily : 85x\n• Agriculteur : niv23\n• Mineur : niv14\n• Bûcheron : niv9\n• Pêcheur : niv2');
+      .setDescription('• Argent : 75M\n• Vote : 80x\n• One-Block : 12,5k blocs minés\n• Grimoires commun : 650\n• Grimoires rare : 100\n• Grimoires épique : 35\n• Grimoires ultime : 10\n• Playtime : 3j\n• Items jetés dans la fontaine : 70\n• Mine : 18k blocs minés\n• Points joueurs : 75k\n• Daily : 85x\n• Agriculteur : niv23\n• Mineur : niv14\n• Bûcheron : niv9\n• Pêcheur : niv2')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137131/Crystal_2_ygyz2g.png');
   } else if (type === 'crystal' && niveau === 3) {
     embed = new EmbedBuilder()
       .setColor('#9941bc')
       .setTitle('Prestige Crystal III')
-      .setDescription('• Argent : 100M\n• Vote : 100x\n• One-Block : 15k blocs minés\n• Grimoires commun : 800\n• Grimoires rare : 135\n• Grimoires épique : 50\n• Grimoires ultime : 15\n• Playtime : 4j\n• Items jetés dans la fontaine : 100\n• Mine : 21,5k blocs minés\n• Points joueurs : 100k\n• Daily : 75x\n• Agriculteur : niv25\n• Mineur : niv17\n• Bûcheron : niv11\n• Pêcheur : niv4');
+      .setDescription('• Argent : 100M\n• Vote : 100x\n• One-Block : 15k blocs minés\n• Grimoires commun : 800\n• Grimoires rare : 135\n• Grimoires épique : 50\n• Grimoires ultime : 15\n• Playtime : 4j\n• Items jetés dans la fontaine : 100\n• Mine : 21,5k blocs minés\n• Points joueurs : 100k\n• Daily : 75x\n• Agriculteur : niv25\n• Mineur : niv17\n• Bûcheron : niv11\n• Pêcheur : niv4')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137131/Crystal_3_ibscmh.png');
   } else if (type === 'rubis' && niveau === 1) {
     embed = new EmbedBuilder()
       .setColor('#a82f24')
       .setTitle('Prestige Rubis I')
-      .setDescription('...');
+      .setDescription('...')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137138/Rubis_1_rk2poe.png');
   } else {
     embed = new EmbedBuilder()
       .setColor('#808080') // couleur grise par défaut pour les autres cas
