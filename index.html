@@ -1,1 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel d'Embeds OB Zelda</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background-color: #1a2e0d;
+            background-image: url('https://res.cloudinary.com/dor9octmp/image/upload/v1744971567/Capture_d_e%CC%81cran_2025-04-18_a%CC%80_11.27.22_fncjkw.png');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e8dfc1;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(26, 46, 13, 0.85);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #5a7c46;
+        }
+        h1 {
+            color: #c4e22b;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 25px;
+            font-size: 32px;
+            border-bottom: 2px solid #5a7c46;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #a7cf40;
+            margin-top: 30px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #c4e22b;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #5a7c46;
+            border-radius: 4px;
+            background-color: rgba(25, 40, 12, 0.8);
+            color: #e8dfc1;
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #c4e22b;
+            box-shadow: 0 0 5px rgba(196, 226, 43, 0.5);
+        }
+        .color-preview {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-left: 10px;
+            vertical-align: middle;
+            border: 2px solid #5a7c46;
+        }
+        button {
+            background-color: #5a7c46;
+            color: #e8dfc1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            display: block;
+            margin: 25px auto;
+            width: 220px;
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #6d9255;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .preview {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(25, 40, 12, 0.6);
+            border-radius: 8px;
+            border-left: 4px solid #c4e22b;
+        }
+        .preview-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #c4e22b;
+        }
+        .preview-description {
+            font-size: 16px;
+            color: #e8dfc1;
+            line-height: 1.4;
+        }
+        .preview-image {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: 4px;
+            border: 1px solid #5a7c46;
+        }
+        .preview-thumbnail {
+            max-width: 80px;
+            margin-top: 10px;
+            border-radius: 4px;
+            float: right;
+            border: 1px solid #5a7c46;
+        }
+        .auth-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: rgba(38, 59, 22, 0.7);
+            border-radius: 6px;
+            border: 1px solid #5a7c46;
+        }
+        .channels-dropdown {
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(255, 107, 107, 0.15);
+            border-radius: 4px;
+            display: none;
+            border-left: 3px solid #ff6b6b;
+        }
+        .success {
+            color: #a7cf40;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(167, 207, 64, 0.15);
+            border-radius: 4px;
+            display: none;
+            border-left: 3px solid #a7cf40;
+        }
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preset-button {
+            background-color: #3a5229;
+            color: #e8dfc1;
+            padding: 8px 12px;
+            border: 1px solid #5a7c46;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .preset-button:hover {
+            background-color: #4d6b36;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #5a7c46;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background-color: transparent;
+            border: none;
+            color: #e8dfc1;
+            cursor: pointer;
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .tab-button.active {
+            background-color: #5a7c46;
+            border-radius: 6px 6px 0 0;
+            color: #e8dfc1;
+        }
+        .tab-content {
+            display: none;
+            padding-top: 15px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .logo {
+            max-width: 120px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .field {
+            margin-bottom: 10px;
+        }
+        .field label {
+            display: inline-block;
+            width: 100px;
+        }
+        .field input {
+            width: calc(100% - 110px);
+            display: inline-block;
+        }
+        .add-field-button {
+            background-color: #4a90e2;
+            color: #e8dfc1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        .add-field-button:hover {
+            background-color: #5a7c46;
+        }
+        .preview-author, .preview-footer {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .preview-author img, .preview-footer img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .preview-fields .preview-field {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://res.cloudinary.com/dor9octmp/image/upload/v1745145521/Logo_discord_uj0p2v.png" alt="Zelda Logo" class="logo">
+        <h1>Panel d'Embeds OB Zelda</h1>
+
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="bot-tab">Envoi par Bot</button>
+                <button class="tab-button" data-tab="webhook-tab">Envoi par Webhook</button>
+            </div>
+
+            <div id="bot-tab" class="tab-content active">
+                <div class="auth-section">
+                    <div class="form-group">
+                        <label for="bot-token">Clé d'authentification du Bot :</label>
+                        <input type="password" id="bot-token" placeholder="Votre clé d'authentification secrète" value="votre_token_secret_pour_le_panel">
+                    </div>
+                </div>
+            </div>
+
+            <div id="webhook-tab" class="tab-content">
+                <div class="auth-section">
+                    <div class="form-group">
+                        <label for="webhook-select">Webhook préenregistré :</label>
+                        <select id="webhook-select">
+                            <option value="">-- Sélectionner un webhook --</option>
+                            <option value="webhook1">Webhook Général</option>
+                            <option value="webhook2">Webhook Annonces</option>
+                            <option value="webhook3">Webhook Staff</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="webhook-url">Ou entrez une URL de webhook :</label>
+                        <input type="text" id="webhook-url" placeholder="https://discord.com/api/webhooks/...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group channels-dropdown">
+            <label for="channel-id">Canal de destination :</label>
+            <select id="channel-id">
+                <!-- Les options seront remplies dynamiquement -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="embed-title">Titre :</label>
+            <input type="text" id="embed-title" placeholder="Titre de l'embed">
+        </div>
+
+        <div class="form-group">
+            <label for="embed-description">Description :</label>
+            <textarea id="embed-description" placeholder="Description de l'embed (supporte le markdown)"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="embed-color">Couleur :</label>
+            <input type="text" id="embed-color" placeholder="#7289DA">
+            <span class="color-preview" id="color-preview" style="background-color: #5a7c46;"></span>
+
+            <div class="preset-buttons">
+                <button class="preset-button" data-color="#5a7c46">Vert Forêt</button>
+                <button class="preset-button" data-color="#c4e22b">Vert Zelda</button>
+                <button class="preset-button" data-color="#8b7355">Marron</button>
+                <button class="preset-button" data-color="#4a90e2">Bleu</button>
+                <button class="preset-button" data-color="#9b59b6">Violet</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="embed-image">URL de l'image :</label>
+            <input type="text" id="embed-image" placeholder="https://exemple.com/image.png">
+        </div>
+
+        <div class="form-group">
+            <label for="embed-thumbnail">URL de la miniature :</label>
+            <input type="text" id="embed-thumbnail" placeholder="https://exemple.com/miniature.png">
+        </div>
+
+        <div class="form-group">
+            <label for="embed-author-name">Nom de l'auteur :</label>
+            <input type="text" id="embed-author-name" placeholder="Nom de l'auteur">
+        </div>
+
+        <div class="form-group">
+            <label for="embed-author-icon">URL de l'icône de l'auteur :</label>
+            <input type="text" id="embed-author-icon" placeholder="https://exemple.com/icon.png">
+        </div>
+
+        <div class="form-group">
+            <label for="embed-footer">Footer :</label>
+            <input type="text" id="embed-footer" placeholder="Texte du footer">
+        </div>
+
+        <div class="form-group">
+            <label for="embed-footer-icon">URL de l'icône du footer :</label>
+            <input type="text" id="embed-footer-icon" placeholder="https://exemple.com/footer-icon.png">
+        </div>
+
+        <div class="form-group">
+            <label>Fields :</label>
+            <div id="fields-container">
+                <div class="field">
+                    <label for="field-name-1">Nom :</label>
+                    <input type="text" id="field-name-1" placeholder="Nom du champ">
+                    <label for="field-value-1">Valeur :</label>
+                    <input type="text" id="field-value-1" placeholder="Valeur du champ">
+                </div>
+                <div class="field">
+                    <label for="field-name-2">Nom :</label>
+                    <input type="text" id="field-name-2" placeholder="Nom du champ">
+                    <label for="field-value-2">Valeur :</label>
+                    <input type="text" id="field-value-2" placeholder="Valeur du champ">
+                </div>
+                <!-- Ajoutez plus de champs si nécessaire -->
+            </div>
+            <button class="add-field-button" id="add-field-button">Ajouter un champ</button>
+        </div>
+
+        <h2>Aperçu :</h2>
+        <div class="preview" id="embed-preview">
+            <div class="preview-author" id="preview-author"></div>
+            <div class="preview-title" id="preview-title">Bienvenue dans la forêt de Zelda</div>
+            <div class="preview-description" id="preview-description">Découvrez les mystères de la forêt et les prestiges qui vous attendent sur notre serveur One-Block. Utilisez la commande /prestige pour connaître les prérequis.</div>
+            <img src="/api/placeholder/400/200" alt="Image d'aperçu" class="preview-image" id="preview-image" style="display: none;">
+            <img src="/api/placeholder/80/80" alt="Miniature d'aperçu" class="preview-thumbnail" id="preview-thumbnail" style="display: none;">
+            <div id="preview-fields" class="preview-fields"></div>
+            <div id="preview-footer" class="preview-footer"></div>
+        </div>
+
+        <button id="send-button">Envoyer l'embed</button>
+
+        <div class="error" id="error-message"></div>
+        <div class="success" id="success-message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des onglets
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+
+                    // Désactiver tous les onglets
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Activer l'onglet sélectionné
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Webhooks préenregistrés
+            const webhooks = {
+                'webhook1': 'https://discord.com/api/webhooks/webhook1_url',
+                'webhook2': 'https://discord.com/api/webhooks/webhook2_url',
+                'webhook3': 'https://discord.com/api/webhooks/webhook3_url'
+            };
+
+            document.getElementById('webhook-select').addEventListener('change', function() {
+                const webhookUrl = webhooks[this.value] || '';
+                document.getElementById('webhook-url').value = webhookUrl;
+            });
+
+            // Boutons de couleur préétablis
+            const colorButtons = document.querySelectorAll('.preset-button');
+            colorButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.getElementById('embed-color').value = color;
+                    document.getElementById('color-preview').style.backgroundColor = color;
+                    document.querySelector('.preview').style.borderLeftColor = color;
+                });
+            });
+
+            // Fonction pour mettre à jour l'aperçu
+            function updatePreview() {
+                const title = document.getElementById('embed-title').value;
+                const description = document.getElementById('embed-description').value;
+                const color = document.getElementById('embed-color').value;
+                const imageUrl = document.getElementById('embed-image').value;
+                const thumbnailUrl = document.getElementById('embed-thumbnail').value;
+                const authorName = document.getElementById('embed-author-name').value;
+                const authorIcon = document.getElementById('embed-author-icon').value;
+                const footerText = document.getElementById('embed-footer').value;
+                const footerIcon = document.getElementById('embed-footer-icon').value;
+
+                document.getElementById('preview-title').textContent = title || 'Bienvenue dans la forêt de Zelda';
+                document.getElementById('preview-description').textContent = description || 'Découvrez les mystères de la forêt et les prestiges qui vous attendent sur notre serveur One-Block. Utilisez la commande /prestige pour connaître les prérequis.';
+
+                if (color) {
+                    document.getElementById('color-preview').style.backgroundColor = color;
+                    document.querySelector('.preview').style.borderLeftColor = color;
+                }
+
+                const previewImage = document.getElementById('preview-image');
+                if (imageUrl) {
+                    previewImage.src = imageUrl;
+                    previewImage.style.display = 'block';
+                } else {
+                    previewImage.style.display = 'none';
+                }
+
+                const previewThumbnail = document.getElementById('preview-thumbnail');
+                if (thumbnailUrl) {
+                    previewThumbnail.src = thumbnailUrl;
+                    previewThumbnail.style.display = 'block';
+                } else {
+                    previewThumbnail.style.display = 'none';
+                }
+
+                // Mettre à jour l'auteur
+                const authorElement = document.getElementById('preview-author');
+                if (authorName || authorIcon) {
+                    let authorHTML = '';
+                    if (authorIcon) {
+                        authorHTML += `<img src="${authorIcon}" alt="Author icon">`;
+                    }
+                    authorHTML += `<span>${authorName || ''}</span>`;
+                    authorElement.innerHTML = authorHTML;
+                    authorElement.style.display = 'flex';
+                } else {
+                    authorElement.style.display = 'none';
+                }
+
+                // Mettre à jour le footer
+                const footerElement = document.getElementById('preview-footer');
+                if (footerText || footerIcon) {
+                    let footerHTML = '';
+                    if (footerIcon) {
+                        footerHTML += `<img src="${footerIcon}" alt="Footer icon">`;
+                    }
+                    footerHTML += `<span>${footerText || ''}</span>`;
+                    footerElement.innerHTML = footerHTML;
+                    footerElement.style.display = 'flex';
+                } else {
+                    footerElement.style.display = 'none';
+                }
+
+                // Mettre à jour les fields
+                const fieldsContainer = document.getElementById('preview-fields');
+                fieldsContainer.innerHTML = '';
+                const fields = document.querySelectorAll('.field');
+                fields.forEach(field => {
+                    const name = field.querySelector('input[type="text"]:first-child').value;
+                    const value = field.querySelector('input[type="text"]:last-child').value;
+                    if (name && value) {
+                        const fieldHTML = `<div class="preview-field"><strong>${name}:</strong> ${value}</div>`;
+                        fieldsContainer.innerHTML += fieldHTML;
+                    }
+                });
+            }
+
+            // Ajouter des écouteurs d'événements aux champs de saisie
+            document.getElementById('embed-title').addEventListener('input', updatePreview);
+            document.getElementById('embed-description').addEventListener('input', updatePreview);
+            document.getElementById('embed-color').addEventListener('input', updatePreview);
+            document.getElementById('embed-image').addEventListener('input', updatePreview);
+            document.getElementById('embed-thumbnail').addEventListener('input', updatePreview);
+            document.getElementById('embed-author-name').addEventListener('input', updatePreview);
+            document.getElementById('embed-author-icon').addEventListener('input', updatePreview);
+            document.getElementById('embed-footer').addEventListener('input', updatePreview);
+            document.getElementById('embed-footer-icon').addEventListener('input', updatePreview);
+            document.querySelectorAll('.field input').forEach(input => {
+                input.addEventListener('input', updatePreview);
+            });
+
+            // Fonction pour envoyer l'embed
+            document.getElementById('send-button').addEventListener('click', async function() {
+                const activeTab = document.querySelector('.tab-content.active').id;
+                let url = '';
+                let method = '';
+                let payload = {};
+
+                const title = document.getElementById('embed-title').value;
+                const description = document.getElementById('embed-description').value;
+                const color = document.getElementById('embed-color').value;
+                const imageUrl = document.getElementById('embed-image').value;
+                const thumbnailUrl = document.getElementById('embed-thumbnail').value;
+                const authorName = document.getElementById('embed-author-name').value;
+                const authorIcon = document.getElementById('embed-author-icon').value;
+                const footerText = document.getElementById('embed-footer').value;
+                const footerIcon = document.getElementById('embed-footer-icon').value;
+                const channelId = document.getElementById('channel-id').value;
+
+                // Calculer la valeur numérique de la couleur hexadécimale pour Discord
+                let colorValue = 0;
+                if (color && color.startsWith('#')) {
+                    colorValue = parseInt(color.slice(1), 16);
+                }
+
+                const fields = [];
+                document.querySelectorAll('.field').forEach(field => {
+                    const name = field.querySelector('input[type="text"]:first-child').value;
+                    const value = field.querySelector('input[type="text"]:last-child').value;
+                    if (name && value) {
+                        fields.push({ name, value });
+                    }
+                });
+
+                const embed = {
+                    title: title,
+                    description: description,
+                    color: colorValue,
+                    image: imageUrl ? { url: imageUrl } : null,
+                    thumbnail: thumbnailUrl ? { url: thumbnailUrl } : null,
+                    author: authorName ? { name: authorName, icon_url: authorIcon || null } : null,
+                    footer: footerText ? { text: footerText, icon_url: footerIcon || null } : null,
+                    fields: fields
+                };
+
+                if (activeTab === 'bot-tab') {
+                    // Utiliser le bot
+                    const botToken = document.getElementById('bot-token').value;
+                    if (!botToken) {
+                        showError("La clé d'authentification du bot est requise !");
+                        return;
+                    }
+
+                    url = '/send-embed'; // Utiliser la route définie dans index.js
+                    method = 'POST';
+                    payload = {
+                        token: botToken,
+                        channelId: channelId,
+                        embed: embed
+                    };
+                } else {
+                    // Utiliser le webhook
+                    const webhookUrl = document.getElementById('webhook-url').value;
+                    if (!webhookUrl) {
+                        showError("L'URL du webhook est requise !");
+                        return;
+                    }
+
+                    url = webhookUrl;
+                    method = 'POST';
+                    payload = {
+                        embeds: [embed]
+                    };
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        showSuccess("Embed envoyé avec succès !");
+                    } else {
+                        const errorData = await response.json().catch(() => ({}));
+                        showError(`Erreur: ${errorData.message || response.statusText}`);
+                    }
+                } catch (error) {
+                    showError(`Erreur: ${error.message}`);
+                }
+            });
+
+            // Fonction pour afficher les messages d'erreur
+            function showError(message) {
+                const errorElement = document.getElementById('error-message');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 5000);
+            }
+
+            // Fonction pour afficher les messages de succès
+            function showSuccess(message) {
+                const successElement = document.getElementById('success-message');
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                setTimeout(() => {
+                    successElement.style.display = 'none';
+                }, 5000);
+            }
+
+            // Charger dynamiquement la liste des salons
+            async function loadChannels() {
+                try {
+                    const response = await fetch('/channels');
+                    if (response.ok) {
+                        const channels = await response.json();
+                        const channelSelect = document.getElementById('channel-id');
+                        channelSelect.innerHTML = '';
+                        channels.forEach(channel => {
+                            const option = document.createElement('option');
+                            option.value = channel.id;
+                            option.textContent = channel.name;
+                            channelSelect.appendChild(option);
+                        });
+                    } else {
+                        showError('Erreur lors du chargement des salons.');
+                    }
+                } catch (error) {
+                    showError(`Erreur: ${error.message}`);
+                }
+            }
+
+            // Charger les salons au chargement de la page
+            loadChannels();
+
+            // Fonction pour ajouter un nouveau champ (field)
+            document.getElementById('add-field-button').addEventListener('click', function() {
+                const fieldsContainer = document.getElementById('fields-container');
+                const fieldCount = fieldsContainer.querySelectorAll('.field').length + 1;
+
+                const newField = document.createElement('div');
+                newField.className = 'field';
+                newField.innerHTML = `
+                    <label for="field-name-${fieldCount}">Nom :</label>
+                    <input type="text" id="field-name-${fieldCount}" placeholder="Nom du champ">
+                    <label for="field-value-${fieldCount}">Valeur :</label>
+                    <input type="text" id="field-value-${fieldCount}" placeholder="Valeur du champ">
+                `;
+
+                fieldsContainer.appendChild(newField);
+                updatePreview(); // Mettre à jour l'aperçu après l'ajout du champ
+            });
+        });
+    </script>
+</body>
+</html>
 
