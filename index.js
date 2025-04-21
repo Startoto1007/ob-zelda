@@ -45,7 +45,7 @@ app.get('/channels', async (req, res) => {
 app.post('/send-embed', async (req, res) => {
   const { token, channelId, embed } = req.body;
 
-  if (token !== process.env.BOT_TOKEN) {
+  if (token !== process.env.PANEL_TOKEN) {
     return res.status(401).json({ error: 'Token invalide.' });
   }
 
