@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
-import setupWebServer from './webServer.js'; // Serveur web
+// import setupWebServer from './webServer.js'; // Serveur web (supprimé)
 
 const client = new Client({
   intents: [
@@ -17,19 +17,19 @@ const client = new Client({
 // Quand le bot est prêt, on enregistre les commandes et définit le statut
 client.once('ready', async () => {
   console.log(`Bot connecté en tant que ${client.user.tag}`);
-  
+
   // Définir le statut d'activité
   client.user.setActivity('Créé par l\'OB Zelda', { type: ActivityType.Listening });
-  
+
   // Enregistrer les commandes globalement
   await client.application.commands.set([prestigeCommand]);
   console.log('Commandes enregistrées!');
-  
+
   // Initialiser les messages planifiés
   scheduledMessages(client);
-  
-  // Mettre en place le serveur web
-  setupWebServer(client);
+
+  // Mettre en place le serveur web (supprimé)
+  // setupWebServer(client);
 });
 
 // Initialiser l'événement de bienvenue
