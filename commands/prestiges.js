@@ -123,10 +123,28 @@ export async function execute(interaction) {
       .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137140/Rubis_3_ay39of.png');
   } else if (type === 'platine' && niveau === 1) {
     embed = new EmbedBuilder()
-      .setColor('#a82f24')
+      .setColor('#502681')
       .setTitle('Prestige Platine I')
-      .setDescription('...')
+      .setDescription('• Argent : 250M\n• Vote : 250x\n• One-Block : 40k blocs minés\n• Grimoires commun : 1800\n• Grimoires rare : 250\n• Grimoires épique : 125\n• Grimoires ultime : 50\n• Playtime : 9j\n• Items jetés dans la fontaine : 270\n• Mine : 35k blocs minés\n• Points joueurs : 250k\n• Daily : 165x\n• Agriculteur : niv36\n• Mineur : niv30\n• Bûcheron : niv21\n• Pêcheur : niv13\n• Chasseur : niv6')
       .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137146/Platine_1_t0fkhk.png');
+  } else if (type === 'platine' && niveau === 2) {
+    embed = new EmbedBuilder()
+      .setColor('#502681')
+      .setTitle('Prestige Platine II')
+      .setDescription('• Argent : 325M\n• Vote : 300x\n• One-Block : 40k blocs minés\n• Grimoires commun : 2000\n• Grimoires rare : 325\n• Grimoires épique : 150\n• Grimoires ultime : 60\n• Playtime : 11j\n• Items jetés dans la fontaine : 270\n• Mine : 35k blocs minés\n• Points joueurs : 250k\n• Daily : 165x\n• Agriculteur : niv36\n• Mineur : niv30\n• Bûcheron : niv21\n• Pêcheur : niv13\n• Chasseur : niv6')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137146/Platine_2_anqk6h.png');
+  } else if (type === 'platine' && niveau === 3) {
+    embed = new EmbedBuilder()
+      .setColor('#502681')
+      .setTitle('Prestige Platine III')
+      .setDescription('• Argent : 400M\n• Vote : 350x\n• One-Block : 50k blocs minés\n• Grimoires commun : 2500\n• Grimoires rare : 400\n• Grimoires épique : 200\n• Grimoires ultime : 75\n• Playtime : 14j\n• Items jetés dans la fontaine : 370\n• Mine : 50k blocs minés\n• Points joueurs : 400k\n• Daily : 230x\n• Agriculteur : niv44\n• Mineur : niv36\n• Bûcheron : niv28\n• Pêcheur : niv19\n• Chasseur : niv11')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137146/Platine_3_ihz8jf.png');
+  } else if (type === 'diamant' && niveau === 1) {
+    embed = new EmbedBuilder()
+      .setColor('#48bef4')
+      .setTitle('Prestige Diamant I')
+      .setDescription('...')
+      .setThumbnail('https://res.cloudinary.com/dor9octmp/image/upload/v1745137154/Diamant_1_lnvhem.webp');
   } else {
     embed = new EmbedBuilder()
       .setColor('#808080') // couleur grise par défaut pour les autres cas
