@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 
 export const data = new SlashCommandBuilder()
@@ -54,33 +54,59 @@ export async function execute(interaction) {
   const subcommand = interaction.options.getSubcommand();
   const joueur = interaction.options.getUser('joueur');
   const durée = interaction.options.getString('durée');
-  const raison = interaction.options.getString('raison') || 'Aucune raison spécifiée';
 
-  switch (subcommand) {
-    case 'mute':
-      await handleMute(interaction, joueur, durée, raison);
-      break;
-    case 'unmute':
-      await handleUnmute(interaction, joueur);
-      break;
-    case 'ban':
-      await handleBan(interaction, joueur, durée, raison);
-      break;
-    case 'unban':
-      await handleUnban(interaction, joueur);
-      break;
-    case 'kick':
-      await handleKick(interaction, joueur, raison);
-      break;
-    case 'avertissement':
-      await handleAvertissement(interaction, joueur, raison);
-      break;
-    case 'def_ban':
-      await handleDefBan(interaction, joueur, raison);
-      break;
-    default:
-      await interaction.reply({ content: 'Commande inconnue', ephemeral: true });
+  // Vérifier si l'utilisateur a le rôle "membre de l'OB"
+  const member = interaction.guild.members.cache.get(interaction.user.id);
+  if (!member.roles.cache.has('1339286435475230800')) {
+    return interaction.reply({ content: 'Vous n\'avez pas les permissions nécessaires pour utiliser cette commande.', ephemeral: true });
   }
+
+  // Demander la raison via un formulaire
+  const modal = new ModalBuilder()
+    .setCustomId('moderationForm')
+    .setTitle('Formulaire de modération');
+
+  const raisonInput = new TextInputBuilder()
+    .setCustomId('raisonInput')
+    .setLabel('Raison de la sanction')
+    .setStyle(TextInputStyle.Paragraph);
+
+  const actionRow = new ActionRowBuilder().addComponents(raisonInput);
+  modal.addComponents(actionRow);
+
+  await interaction.showModal(modal);
+
+  const filter = i => i.customId === 'moderationForm';
+  interaction.client.on('interactionCreate', async i => {
+    if (!filter(i)) return;
+    const raison = i.fields.getTextInputValue('raisonInput');
+
+    switch (subcommand) {
+      case 'mute':
+        await handleMute(i, joueur, durée, raison);
+        break;
+      case 'unmute':
+        await handleUnmute(i, joueur);
+        break;
+      case 'ban':
+        await handleBan(i, joueur, durée, raison);
+        break;
+      case 'unban':
+        await handleUnban(i, joueur);
+        break;
+      case 'kick':
+        await handleKick(i, joueur, raison);
+        break;
+      case 'avertissement':
+        await handleAvertissement(i, joueur, raison);
+        break;
+      case 'def_ban':
+        await handleDefBan(i, joueur, raison);
+        break;
+      default:
+        await i.reply({ content: 'Commande inconnue', ephemeral: true });
+    }
+  });
 }
 
 async function handleMute(interaction, joueur, durée, raison) {
