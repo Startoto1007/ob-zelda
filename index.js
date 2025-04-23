@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
+import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js'; // Commandes de modération
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
 import express from 'express';
@@ -19,7 +20,13 @@ const client = new Client({
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Configuration CORS
+const corsOptions = {
+  origin: 'https://startoto1007.github.io', // Remplacez par votre domaine GitHub Pages
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Route pour récupérer la liste des salons
@@ -75,7 +82,7 @@ client.once('ready', async () => {
   client.user.setActivity('Créé par l\'OB Zelda', { type: ActivityType.Listening });
 
   // Enregistrer les commandes globalement
-  await client.application.commands.set([prestigeCommand]);
+  await client.application.commands.set([prestigeCommand, moderationCommands]);
   console.log('Commandes enregistrées!');
 
   // Initialiser les messages planifiés
@@ -85,11 +92,15 @@ client.once('ready', async () => {
 // Initialiser l'événement de bienvenue
 memberJoin(client);
 
-// Exécution des commandes (ici, pour /prestige)
+// Exécution des commandes (ici, pour /prestige et /moderation)
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
-  if (interaction.commandName === 'prestige') {
+
+  const commandName = interaction.commandName;
+  if (commandName === 'prestige') {
     await prestigeExecute(interaction);
+  } else if (commandName === 'moderation') {
+    await moderationExecute(interaction);
   }
 });
 
