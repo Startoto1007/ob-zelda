@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3000;
 
 // Configuration CORS
 const corsOptions = {
-  origin: 'https://startoto1007.github.io', // Remplacez par votre domaine GitHub Pages
+  origin: 'https://startoto1007.github.io/ob-zelda', // Remplacez par votre domaine GitHub Pages
   optionsSuccessStatus: 200,
 };
 
