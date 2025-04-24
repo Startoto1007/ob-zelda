@@ -71,6 +71,64 @@ app.post('/send-embed', async (req, res) => {
   }
 });
 
+// Route pour démarrer un giveaway
+app.post('/start-giveaway', async (req, res) => {
+  const { token, channelId, giveaway } = req.body;
+
+  if (token !== process.env.PANEL_TOKEN) {
+    return res.status(401).json({ error: 'Token invalide.' });
+  }
+
+  const channel = client.channels.cache.get(channelId);
+  if (!channel) {
+    return res.status(404).json({ error: 'Salon introuvable.' });
+  }
+
+  try {
+    const embed = new EmbedBuilder()
+      .setTitle('🎉 Nouveau Giveaway !')
+      .setDescription(`Gagnez **${giveaway.prize}** en participant au giveaway !\nNombre de gagnants : **${giveaway.winnerCount}**\nDurée : **${giveaway.duration.value} ${giveaway.duration.unit}**`)
+      .setColor(giveaway.color)
+      .setTimestamp();
+
+    const row = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId('participer')
+          .setLabel('Participer')
+          .setStyle(ButtonStyle.Primary)
+      );
+
+    const message = await channel.send({ embeds: [embed], components: [row] });
+
+    const collector = message.createMessageComponentCollector({ time: giveaway.duration.value * 60000 });
+
+    collector.on('collect', async i => {
+      if (i.customId === 'participer') {
+        await i.reply({ content: 'Vous avez participé au giveaway !', ephemeral: true });
+      }
+    });
+
+    collector.on('end', async collected => {
+      const winners = collected.users.filter(user => !collected.users.some(other => other.id === user.id));
+      const selectedWinners = winners.sort(() => 0.5 - Math.random()).slice(0, giveaway.winnerCount);
+
+      const winnersEmbed = new EmbedBuilder()
+        .setTitle('🎉 Résultats du Giveaway !')
+        .setDescription(`Félicitations aux gagnants :\n${selectedWinners.map(winner => `- ${winner.tag}`).join('\n')}`)
+        .setColor(giveaway.color)
+        .setTimestamp();
+
+      await channel.send({ embeds: [winnersEmbed] });
+    });
+
+    res.json({ success: true, message: 'Giveaway démarré avec succès!' });
+  } catch (error) {
+    console.error('Erreur lors du démarrage du giveaway:', error);
+    res.status(500).json({ error: 'Erreur lors du démarrage du giveaway.' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Serveur web démarré sur le port ${PORT}`);
 });
@@ -93,7 +151,7 @@ client.once('ready', async () => {
 // Initialiser l'événement de bienvenue
 memberJoin(client);
 
-// Exécution des commandes (ici, pour /prestige, /moderation et /concours)
+// Exécution des commandes (ici, pour /prestige, /moderation et /giveaway)
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
@@ -102,7 +160,7 @@ client.on('interactionCreate', async (interaction) => {
     await prestigeExecute(interaction);
   } else if (commandName === 'moderation') {
     await moderationExecute(interaction);
-  } else if (commandName === 'concours') {
+  } else if (commandName === 'giveaway') {
     await giveawayExecute(interaction);
   }
 });
