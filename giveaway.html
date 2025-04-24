@@ -257,6 +257,31 @@
         .winner-count {
             width: 80px;
         }
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            color: #c4e22b;
+            display: none;
+        }
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(196, 226, 43, 0.3);
+            border-radius: 50%;
+            border-top-color: #c4e22b;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .api-setup {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(38, 59, 22, 0.7);
+            border-radius: 6px;
+            border: 1px solid #5a7c46;
+        }
     </style>
 </head>
 <body>
@@ -265,21 +290,30 @@
         <h1>Panel de Giveaway OB Zelda</h1>
         <a href="index.html" class="nav-button">Retour au menu</a>
 
+        <div class="api-setup">
+            <div class="form-group">
+                <label for="api-url">URL de l'API du Bot:</label>
+                <input type="text" id="api-url" placeholder="Ex: https://mon-bot-discord.up.railway.app">
+            </div>
+        </div>
+
         <div class="auth-section">
             <div class="form-group">
                 <label for="bot-token">Clé d'authentification du Bot :</label>
-                <input type="password" id="bot-token" placeholder="Votre clé d'authentification secrète" value="votre_token_secret_pour_le_panel">
+                <input type="password" id="bot-token" placeholder="Votre clé d'authentification secrète">
             </div>
         </div>
 
         <div class="form-group channels-dropdown">
             <label for="channel-id">Canal de destination :</label>
             <select id="channel-id">
-                <!-- Les options seront remplies dynamiquement -->
-                <option value="channel1">📢-annonces</option>
-                <option value="channel2">🎮-giveaways</option>
-                <option value="channel3">🎁-events</option>
+                <option value="">-- Chargement des canaux --</option>
             </select>
+        </div>
+
+        <div class="loading" id="loading-indicator">
+            <div class="spinner"></div>
+            <p>Chargement en cours...</p>
         </div>
 
         <div class="form-group">
@@ -301,9 +335,8 @@
                 <div class="duration-unit">
                     <select id="duration-unit">
                         <option value="minutes">Minutes</option>
-                        <option value="hours">Heures</option>
-                        <option value="days" selected>Jours</option>
-                        <option value="weeks">Semaines</option>
+                        <option value="heures">Heures</option>
+                        <option value="jours" selected>Jours</option>
                     </select>
                 </div>
             </div>
@@ -315,7 +348,7 @@
 
         <div class="form-group">
             <label for="giveaway-color">Couleur :</label>
-            <input type="text" id="giveaway-color" placeholder="#7289DA">
+            <input type="text" id="giveaway-color" placeholder="#7289DA" value="#5a7c46">
             <span class="color-preview" id="color-preview" style="background-color: #5a7c46;"></span>
 
             <div class="preset-buttons">
@@ -327,61 +360,14 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="giveaway-image">URL de l'image (optionnel) :</label>
-            <input type="text" id="giveaway-image" placeholder="https://exemple.com/image.png">
-        </div>
-
-        <div class="form-group">
-            <label for="giveaway-thumbnail">URL de la miniature (optionnel) :</label>
-            <input type="text" id="giveaway-thumbnail" placeholder="https://exemple.com/miniature.png">
-        </div>
-
-        <div class="form-group requirements-container">
-            <label>Conditions de participation (optionnel) :</label>
-            
-            <div class="requirement">
-                <input type="checkbox" id="req-role">
-                <label for="req-role">Avoir un rôle spécifique</label>
-            </div>
-            <div class="form-group" id="role-selector" style="display: none;">
-                <select id="required-role">
-                    <option value="">-- Sélectionner un rôle --</option>
-                    <option value="role1">Membre</option>
-                    <option value="role2">VIP</option>
-                    <option value="role3">Prestige 1</option>
-                    <option value="role4">Prestige 2</option>
-                </select>
-            </div>
-            
-            <div class="requirement">
-                <input type="checkbox" id="req-level">
-                <label for="req-level">Niveau minimum sur le serveur</label>
-            </div>
-            <div class="form-group" id="level-input" style="display: none;">
-                <input type="number" id="required-level" min="1" placeholder="Niveau minimum">
-            </div>
-            
-            <div class="requirement">
-                <input type="checkbox" id="req-message">
-                <label for="req-message">Nombre minimum de messages</label>
-            </div>
-            <div class="form-group" id="message-input" style="display: none;">
-                <input type="number" id="required-messages" min="1" placeholder="Nombre minimum de messages">
-            </div>
-        </div>
-
         <h2>Aperçu :</h2>
         <div class="preview" id="giveaway-preview">
-            <div class="preview-title" id="preview-title">🎉 GIVEAWAY: 1000 emeraudes</div>
+            <div class="preview-title" id="preview-title">🎉 GIVEAWAY: clef épique</div>
             <div class="preview-description" id="preview-description">Participez pour tenter de gagner ce lot exceptionnel!</div>
-            <img src="/api/placeholder/400/200" alt="Image d'aperçu" class="preview-image" id="preview-image" style="display: none;">
-            <img src="/api/placeholder/80/80" alt="Miniature d'aperçu" class="preview-thumbnail" id="preview-thumbnail" style="display: none;">
             
             <div class="preview-footer">
                 <p>⏱️ Se termine: <span id="preview-end-time">dans 3 jours</span></p>
                 <p>👥 Gagnants: <span id="preview-winners">1</span></p>
-                <p>🔍 Conditions: <span id="preview-requirements">Aucune</span></p>
             </div>
         </div>
 
@@ -393,6 +379,91 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Configuration et variables globales
+            let apiUrl = localStorage.getItem('apiUrl') || '';
+            const apiUrlInput = document.getElementById('api-url');
+            apiUrlInput.value = apiUrl;
+            
+            // Mise à jour de l'URL de l'API quand elle change
+            apiUrlInput.addEventListener('change', function() {
+                apiUrl = this.value.trim();
+                if (apiUrl.endsWith('/')) {
+                    apiUrl = apiUrl.slice(0, -1);
+                }
+                localStorage.setItem('apiUrl', apiUrl);
+                loadChannels();
+            });
+
+            // Fonctions utilitaires
+            function showLoading(show = true) {
+                document.getElementById('loading-indicator').style.display = show ? 'block' : 'none';
+            }
+
+            function showError(message) {
+                const errorElement = document.getElementById('error-message');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 5000);
+            }
+
+            function showSuccess(message) {
+                const successElement = document.getElementById('success-message');
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                setTimeout(() => {
+                    successElement.style.display = 'none';
+                }, 5000);
+            }
+
+            // Chargement des canaux depuis l'API
+            async function loadChannels() {
+                if (!apiUrl) {
+                    showError("Veuillez configurer l'URL de l'API du bot");
+                    return;
+                }
+                
+                const channelSelect = document.getElementById('channel-id');
+                channelSelect.innerHTML = '<option value="">-- Chargement des canaux --</option>';
+                
+                showLoading(true);
+                
+                try {
+                    const response = await fetch(`${apiUrl}/channels`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erreur HTTP: ${response.status}`);
+                    }
+                    
+                    const channels = await response.json();
+                    
+                    // Mise à jour du dropdown
+                    channelSelect.innerHTML = '<option value="">-- Sélectionner un canal --</option>';
+                    channels.forEach(channel => {
+                        const option = document.createElement('option');
+                        option.value = channel.id;
+                        option.textContent = `${channel.name}`;
+                        channelSelect.appendChild(option);
+                    });
+                    
+                    showSuccess("Canaux chargés avec succès!");
+                } catch (error) {
+                    console.error("Erreur lors du chargement des canaux:", error);
+                    showError(`Erreur lors du chargement des canaux: ${error.message}`);
+                    channelSelect.innerHTML = '<option value="">-- Erreur de chargement --</option>';
+                } finally {
+                    showLoading(false);
+                }
+            }
+
             // Boutons de couleur préétablis
             const colorButtons = document.querySelectorAll('.preset-button');
             colorButtons.forEach(button => {
@@ -404,60 +475,26 @@
                 });
             });
 
-            // Gestion des conditions de participation
-            document.getElementById('req-role').addEventListener('change', function() {
-                document.getElementById('role-selector').style.display = this.checked ? 'block' : 'none';
-                updatePreview();
-            });
-
-            document.getElementById('req-level').addEventListener('change', function() {
-                document.getElementById('level-input').style.display = this.checked ? 'block' : 'none';
-                updatePreview();
-            });
-
-            document.getElementById('req-message').addEventListener('change', function() {
-                document.getElementById('message-input').style.display = this.checked ? 'block' : 'none';
-                updatePreview();
+            // Surveillance des changements pour mettre à jour l'aperçu
+            document.getElementById('giveaway-color').addEventListener('input', function() {
+                const color = this.value;
+                if (color) {
+                    document.getElementById('color-preview').style.backgroundColor = color;
+                    document.querySelector('.preview').style.borderLeftColor = color;
+                }
             });
 
             // Fonction pour mettre à jour l'aperçu
             function updatePreview() {
                 const prize = document.getElementById('giveaway-prize').value;
                 const description = document.getElementById('giveaway-description').value;
-                const color = document.getElementById('giveaway-color').value;
-                const imageUrl = document.getElementById('giveaway-image').value;
-                const thumbnailUrl = document.getElementById('giveaway-thumbnail').value;
                 const durationValue = document.getElementById('duration-value').value;
                 const durationUnit = document.getElementById('duration-unit').value;
                 const winnerCount = document.getElementById('winner-count').value;
 
                 // Mise à jour du titre et de la description
-                document.getElementById('preview-title').textContent = prize ? `🎉 GIVEAWAY: ${prize}` : '🎉 GIVEAWAY: 1000 emeraudes';
+                document.getElementById('preview-title').textContent = prize ? `🎉 GIVEAWAY: ${prize}` : '🎉 GIVEAWAY: clef épique';
                 document.getElementById('preview-description').textContent = description || 'Participez pour tenter de gagner ce lot exceptionnel!';
-
-                // Mise à jour de la couleur
-                if (color) {
-                    document.getElementById('color-preview').style.backgroundColor = color;
-                    document.querySelector('.preview').style.borderLeftColor = color;
-                }
-
-                // Mise à jour de l'image
-                const previewImage = document.getElementById('preview-image');
-                if (imageUrl) {
-                    previewImage.src = imageUrl;
-                    previewImage.style.display = 'block';
-                } else {
-                    previewImage.style.display = 'none';
-                }
-
-                // Mise à jour de la miniature
-                const previewThumbnail = document.getElementById('preview-thumbnail');
-                if (thumbnailUrl) {
-                    previewThumbnail.src = thumbnailUrl;
-                    previewThumbnail.style.display = 'block';
-                } else {
-                    previewThumbnail.style.display = 'none';
-                }
 
                 // Mise à jour de la durée
                 let endTimeText = 'bientôt';
@@ -466,14 +503,11 @@
                         case 'minutes':
                             endTimeText = `dans ${durationValue} minute(s)`;
                             break;
-                        case 'hours':
+                        case 'heures':
                             endTimeText = `dans ${durationValue} heure(s)`;
                             break;
-                        case 'days':
+                        case 'jours':
                             endTimeText = `dans ${durationValue} jour(s)`;
-                            break;
-                        case 'weeks':
-                            endTimeText = `dans ${durationValue} semaine(s)`;
                             break;
                     }
                 }
@@ -481,86 +515,47 @@
 
                 // Mise à jour du nombre de gagnants
                 document.getElementById('preview-winners').textContent = winnerCount || '1';
-
-                // Mise à jour des conditions
-                let requirements = [];
-                if (document.getElementById('req-role').checked) {
-                    const role = document.getElementById('required-role').value;
-                    const roleName = role ? document.getElementById('required-role').options[document.getElementById('required-role').selectedIndex].text : 'un rôle';
-                    requirements.push(`Avoir le rôle ${roleName}`);
-                }
-                if (document.getElementById('req-level').checked) {
-                    const level = document.getElementById('required-level').value || 'X';
-                    requirements.push(`Niveau ${level} minimum`);
-                }
-                if (document.getElementById('req-message').checked) {
-                    const messages = document.getElementById('required-messages').value || 'X';
-                    requirements.push(`${messages} messages minimum`);
-                }
-
-                document.getElementById('preview-requirements').textContent = requirements.length > 0 ? requirements.join(', ') : 'Aucune';
             }
 
             // Ajouter des écouteurs d'événements aux champs de saisie
             document.getElementById('giveaway-prize').addEventListener('input', updatePreview);
             document.getElementById('giveaway-description').addEventListener('input', updatePreview);
-            document.getElementById('giveaway-color').addEventListener('input', updatePreview);
-            document.getElementById('giveaway-image').addEventListener('input', updatePreview);
-            document.getElementById('giveaway-thumbnail').addEventListener('input', updatePreview);
             document.getElementById('duration-value').addEventListener('input', updatePreview);
             document.getElementById('duration-unit').addEventListener('change', updatePreview);
             document.getElementById('winner-count').addEventListener('input', updatePreview);
-            document.getElementById('required-role').addEventListener('change', updatePreview);
-            document.getElementById('required-level').addEventListener('input', updatePreview);
-            document.getElementById('required-messages').addEventListener('input', updatePreview);
 
             // Fonction pour lancer le giveaway
             document.getElementById('start-giveaway-button').addEventListener('click', async function() {
+                if (!apiUrl) {
+                    showError("Veuillez configurer l'URL de l'API du bot");
+                    return;
+                }
+                
                 const botToken = document.getElementById('bot-token').value;
                 const channelId = document.getElementById('channel-id').value;
                 const prize = document.getElementById('giveaway-prize').value;
                 const description = document.getElementById('giveaway-description').value;
                 const color = document.getElementById('giveaway-color').value;
-                const imageUrl = document.getElementById('giveaway-image').value;
-                const thumbnailUrl = document.getElementById('giveaway-thumbnail').value;
                 const durationValue = document.getElementById('duration-value').value;
                 const durationUnit = document.getElementById('duration-unit').value;
                 const winnerCount = document.getElementById('winner-count').value;
 
                 // Vérification des champs obligatoires
                 if (!botToken) {
-                    showError("La clé d'authentification du bot est requise !");
+                    showError("La clé d'authentification du bot est requise!");
                     return;
                 }
                 if (!channelId) {
-                    showError("Veuillez sélectionner un canal de destination !");
+                    showError("Veuillez sélectionner un canal de destination!");
                     return;
                 }
                 if (!prize) {
-                    showError("Veuillez spécifier un prix pour le giveaway !");
+                    showError("Veuillez spécifier un prix pour le giveaway!");
                     return;
                 }
                 if (!durationValue) {
-                    showError("Veuillez spécifier une durée pour le giveaway !");
+                    showError("Veuillez spécifier une durée pour le giveaway!");
                     return;
-                }
-
-                // Collecte des conditions
-                const requirements = {};
-                if (document.getElementById('req-role').checked) {
-                    requirements.role = document.getElementById('required-role').value;
-                }
-                if (document.getElementById('req-level').checked) {
-                    requirements.level = document.getElementById('required-level').value;
-                }
-                if (document.getElementById('req-message').checked) {
-                    requirements.messages = document.getElementById('required-messages').value;
-                }
-
-                // Calcul de la couleur pour Discord
-                let colorValue = 0;
-                if (color && color.startsWith('#')) {
-                    colorValue = parseInt(color.slice(1), 16);
                 }
 
                 // Construction du payload
@@ -570,74 +565,48 @@
                     giveaway: {
                         prize: prize,
                         description: description,
-                        color: colorValue,
-                        imageUrl: imageUrl,
-                        thumbnailUrl: thumbnailUrl,
+                        color: color,
                         duration: {
                             value: parseInt(durationValue),
                             unit: durationUnit
                         },
-                        winnerCount: parseInt(winnerCount) || 1,
-                        requirements: requirements
+                        winnerCount: parseInt(winnerCount) || 1
                     }
                 };
 
+                showLoading(true);
+                
                 try {
-                    // Simulation de l'envoi de la requête
-                    // En production, remplacez par un vrai fetch
-                    console.log("Envoi du payload:", payload);
-                    
-                    // Simule une réponse réussie après un délai
-                    setTimeout(() => {
-                        showSuccess("Giveaway lancé avec succès !");
-                    }, 1000);
-                    
-                    // Dans une implémentation réelle, vous feriez:
-                    /*
-                    const response = await fetch('/start-giveaway', {
+                    const response = await fetch(`${apiUrl}/start-giveaway`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(payload)
                     });
-
-                    if (response.ok) {
-                        showSuccess("Giveaway lancé avec succès !");
-                    } else {
-                        const errorData = await response.json().catch(() => ({}));
-                        showError(`Erreur: ${errorData.message || response.statusText}`);
+                    
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Une erreur s\'est produite');
                     }
-                    */
+                    
+                    showSuccess("Giveaway lancé avec succès!");
                 } catch (error) {
+                    console.error("Erreur lors du lancement du giveaway:", error);
                     showError(`Erreur: ${error.message}`);
+                } finally {
+                    showLoading(false);
                 }
             });
 
-            // Fonction pour afficher les messages d'erreur
-            function showError(message) {
-                const errorElement = document.getElementById('error-message');
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                document.getElementById('success-message').style.display = 'none';
-                setTimeout(() => {
-                    errorElement.style.display = 'none';
-                }, 5000);
-            }
-
-            // Fonction pour afficher les messages de succès
-            function showSuccess(message) {
-                const successElement = document.getElementById('success-message');
-                successElement.textContent = message;
-                successElement.style.display = 'block';
-                document.getElementById('error-message').style.display = 'none';
-                setTimeout(() => {
-                    successElement.style.display = 'none';
-                }, 5000);
-            }
-
             // Initialiser l'aperçu
             updatePreview();
+            
+            // Charger les canaux si l'URL de l'API est déjà configurée
+            if (apiUrl) {
+                loadChannels();
+            }
         });
     </script>
 </body>
