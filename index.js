@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js'; // Commandes de modération
+import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js'; // Commandes de giveaway
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
 import express from 'express';
@@ -22,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 
 // Configuration CORS
 const corsOptions = {
-  origin: 'https://startoto1007.github.io/ob-zelda', // Remplacez par votre domaine GitHub Pages
+  origin: 'https://startoto1007.github.io', // Remplacez par votre domaine GitHub Pages
   optionsSuccessStatus: 200,
 };
 
@@ -82,7 +83,7 @@ client.once('ready', async () => {
   client.user.setActivity('Créé par l\'OB Zelda', { type: ActivityType.Listening });
 
   // Enregistrer les commandes globalement
-  await client.application.commands.set([prestigeCommand, moderationCommands]);
+  await client.application.commands.set([prestigeCommand, moderationCommands, giveawayCommands]);
   console.log('Commandes enregistrées!');
 
   // Initialiser les messages planifiés
@@ -92,7 +93,7 @@ client.once('ready', async () => {
 // Initialiser l'événement de bienvenue
 memberJoin(client);
 
-// Exécution des commandes (ici, pour /prestige et /moderation)
+// Exécution des commandes (ici, pour /prestige, /moderation et /concours)
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
@@ -101,6 +102,8 @@ client.on('interactionCreate', async (interaction) => {
     await prestigeExecute(interaction);
   } else if (commandName === 'moderation') {
     await moderationExecute(interaction);
+  } else if (commandName === 'concours') {
+    await giveawayExecute(interaction);
   }
 });
 
