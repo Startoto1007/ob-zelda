@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Giveaway OB Zelda</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background-color: #1a2e0d;
+            background-image: url('https://res.cloudinary.com/dor9octmp/image/upload/v1744971567/Capture_d_e%CC%81cran_2025-04-18_a%CC%80_11.27.22_fncjkw.png');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e8dfc1;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(26, 46, 13, 0.85);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #5a7c46;
+        }
+        h1 {
+            color: #c4e22b;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 25px;
+            font-size: 32px;
+            border-bottom: 2px solid #5a7c46;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #a7cf40;
+            margin-top: 30px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #c4e22b;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #5a7c46;
+            border-radius: 4px;
+            background-color: rgba(25, 40, 12, 0.8);
+            color: #e8dfc1;
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #c4e22b;
+            box-shadow: 0 0 5px rgba(196, 226, 43, 0.5);
+        }
+        .color-preview {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-left: 10px;
+            vertical-align: middle;
+            border: 2px solid #5a7c46;
+        }
+        button {
+            background-color: #5a7c46;
+            color: #e8dfc1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            display: block;
+            margin: 25px auto;
+            width: 220px;
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #6d9255;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .preview {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(25, 40, 12, 0.6);
+            border-radius: 8px;
+            border-left: 4px solid #c4e22b;
+        }
+        .preview-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #c4e22b;
+        }
+        .preview-description {
+            font-size: 16px;
+            color: #e8dfc1;
+            line-height: 1.4;
+        }
+        .preview-image {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: 4px;
+            border: 1px solid #5a7c46;
+        }
+        .preview-thumbnail {
+            max-width: 80px;
+            margin-top: 10px;
+            border-radius: 4px;
+            float: right;
+            border: 1px solid #5a7c46;
+        }
+        .auth-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: rgba(38, 59, 22, 0.7);
+            border-radius: 6px;
+            border: 1px solid #5a7c46;
+        }
+        .channels-dropdown {
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(255, 107, 107, 0.15);
+            border-radius: 4px;
+            display: none;
+            border-left: 3px solid #ff6b6b;
+        }
+        .success {
+            color: #a7cf40;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(167, 207, 64, 0.15);
+            border-radius: 4px;
+            display: none;
+            border-left: 3px solid #a7cf40;
+        }
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preset-button {
+            background-color: #3a5229;
+            color: #e8dfc1;
+            padding: 8px 12px;
+            border: 1px solid #5a7c46;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .preset-button:hover {
+            background-color: #4d6b36;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #5a7c46;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background-color: transparent;
+            border: none;
+            color: #e8dfc1;
+            cursor: pointer;
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .tab-button.active {
+            background-color: #5a7c46;
+            border-radius: 6px 6px 0 0;
+            color: #e8dfc1;
+        }
+        .tab-content {
+            display: none;
+            padding-top: 15px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .logo {
+            max-width: 120px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .duration-container {
+            display: flex;
+            gap: 10px;
+        }
+        .duration-input {
+            flex: 1;
+        }
+        .duration-unit {
+            flex: 1;
+        }
+        .requirements-container {
+            padding: 15px;
+            background-color: rgba(38, 59, 22, 0.7);
+            border-radius: 6px;
+            border: 1px solid #5a7c46;
+            margin-bottom: 20px;
+        }
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .requirement input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        .nav-button {
+            background-color: #3a5229;
+            color: #e8dfc1;
+            padding: 8px 16px;
+            border: 1px solid #5a7c46;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            font-family: 'Crimson Text', serif;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .nav-button:hover {
+            background-color: #4d6b36;
+        }
+        .winner-count {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://res.cloudinary.com/dor9octmp/image/upload/v1745145521/Logo_discord_uj0p2v.png" alt="Zelda Logo" class="logo">
+        <h1>Panel de Giveaway OB Zelda</h1>
+        <a href="menu.html" class="nav-button">Retour au menu</a>
+
+        <div class="auth-section">
+            <div class="form-group">
+                <label for="bot-token">Clé d'authentification du Bot :</label>
+                <input type="password" id="bot-token" placeholder="Votre clé d'authentification secrète" value="votre_token_secret_pour_le_panel">
+            </div>
+        </div>
+
+        <div class="form-group channels-dropdown">
+            <label for="channel-id">Canal de destination :</label>
+            <select id="channel-id">
+                <!-- Les options seront remplies dynamiquement -->
+                <option value="channel1">📢-annonces</option>
+                <option value="channel2">🎮-giveaways</option>
+                <option value="channel3">🎁-events</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="giveaway-prize">Prix du giveaway :</label>
+            <input type="text" id="giveaway-prize" placeholder="Ex: 1000 emeraudes">
+        </div>
+
+        <div class="form-group">
+            <label for="giveaway-description">Description (optionnel) :</label>
+            <textarea id="giveaway-description" placeholder="Description du giveaway (supporte le markdown)"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Durée du giveaway :</label>
+            <div class="duration-container">
+                <div class="duration-input">
+                    <input type="number" id="duration-value" min="1" placeholder="Durée">
+                </div>
+                <div class="duration-unit">
+                    <select id="duration-unit">
+                        <option value="minutes">Minutes</option>
+                        <option value="hours">Heures</option>
+                        <option value="days" selected>Jours</option>
+                        <option value="weeks">Semaines</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre de gagnants : <input type="number" id="winner-count" min="1" value="1" class="winner-count"></label>
+        </div>
+
+        <div class="form-group">
+            <label for="giveaway-color">Couleur :</label>
+            <input type="text" id="giveaway-color" placeholder="#7289DA">
+            <span class="color-preview" id="color-preview" style="background-color: #5a7c46;"></span>
+
+            <div class="preset-buttons">
+                <button class="preset-button" data-color="#5a7c46">Vert Forêt</button>
+                <button class="preset-button" data-color="#c4e22b">Vert Zelda</button>
+                <button class="preset-button" data-color="#8b7355">Marron</button>
+                <button class="preset-button" data-color="#4a90e2">Bleu</button>
+                <button class="preset-button" data-color="#9b59b6">Violet</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="giveaway-image">URL de l'image (optionnel) :</label>
+            <input type="text" id="giveaway-image" placeholder="https://exemple.com/image.png">
+        </div>
+
+        <div class="form-group">
+            <label for="giveaway-thumbnail">URL de la miniature (optionnel) :</label>
+            <input type="text" id="giveaway-thumbnail" placeholder="https://exemple.com/miniature.png">
+        </div>
+
+        <div class="form-group requirements-container">
+            <label>Conditions de participation (optionnel) :</label>
+            
+            <div class="requirement">
+                <input type="checkbox" id="req-role">
+                <label for="req-role">Avoir un rôle spécifique</label>
+            </div>
+            <div class="form-group" id="role-selector" style="display: none;">
+                <select id="required-role">
+                    <option value="">-- Sélectionner un rôle --</option>
+                    <option value="role1">Membre</option>
+                    <option value="role2">VIP</option>
+                    <option value="role3">Prestige 1</option>
+                    <option value="role4">Prestige 2</option>
+                </select>
+            </div>
+            
+            <div class="requirement">
+                <input type="checkbox" id="req-level">
+                <label for="req-level">Niveau minimum sur le serveur</label>
+            </div>
+            <div class="form-group" id="level-input" style="display: none;">
+                <input type="number" id="required-level" min="1" placeholder="Niveau minimum">
+            </div>
+            
+            <div class="requirement">
+                <input type="checkbox" id="req-message">
+                <label for="req-message">Nombre minimum de messages</label>
+            </div>
+            <div class="form-group" id="message-input" style="display: none;">
+                <input type="number" id="required-messages" min="1" placeholder="Nombre minimum de messages">
+            </div>
+        </div>
+
+        <h2>Aperçu :</h2>
+        <div class="preview" id="giveaway-preview">
+            <div class="preview-title" id="preview-title">🎉 GIVEAWAY: 1000 emeraudes</div>
+            <div class="preview-description" id="preview-description">Participez pour tenter de gagner ce lot exceptionnel!</div>
+            <img src="/api/placeholder/400/200" alt="Image d'aperçu" class="preview-image" id="preview-image" style="display: none;">
+            <img src="/api/placeholder/80/80" alt="Miniature d'aperçu" class="preview-thumbnail" id="preview-thumbnail" style="display: none;">
+            
+            <div class="preview-footer">
+                <p>⏱️ Se termine: <span id="preview-end-time">dans 3 jours</span></p>
+                <p>👥 Gagnants: <span id="preview-winners">1</span></p>
+                <p>🔍 Conditions: <span id="preview-requirements">Aucune</span></p>
+            </div>
+        </div>
+
+        <button id="start-giveaway-button">Lancer le giveaway</button>
+
+        <div class="error" id="error-message"></div>
+        <div class="success" id="success-message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Boutons de couleur préétablis
+            const colorButtons = document.querySelectorAll('.preset-button');
+            colorButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.getElementById('giveaway-color').value = color;
+                    document.getElementById('color-preview').style.backgroundColor = color;
+                    document.querySelector('.preview').style.borderLeftColor = color;
+                });
+            });
+
+            // Gestion des conditions de participation
+            document.getElementById('req-role').addEventListener('change', function() {
+                document.getElementById('role-selector').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+
+            document.getElementById('req-level').addEventListener('change', function() {
+                document.getElementById('level-input').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+
+            document.getElementById('req-message').addEventListener('change', function() {
+                document.getElementById('message-input').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+
+            // Fonction pour mettre à jour l'aperçu
+            function updatePreview() {
+                const prize = document.getElementById('giveaway-prize').value;
+                const description = document.getElementById('giveaway-description').value;
+                const color = document.getElementById('giveaway-color').value;
+                const imageUrl = document.getElementById('giveaway-image').value;
+                const thumbnailUrl = document.getElementById('giveaway-thumbnail').value;
+                const durationValue = document.getElementById('duration-value').value;
+                const durationUnit = document.getElementById('duration-unit').value;
+                const winnerCount = document.getElementById('winner-count').value;
+
+                // Mise à jour du titre et de la description
+                document.getElementById('preview-title').textContent = prize ? `🎉 GIVEAWAY: ${prize}` : '🎉 GIVEAWAY: 1000 emeraudes';
+                document.getElementById('preview-description').textContent = description || 'Participez pour tenter de gagner ce lot exceptionnel!';
+
+                // Mise à jour de la couleur
+                if (color) {
+                    document.getElementById('color-preview').style.backgroundColor = color;
+                    document.querySelector('.preview').style.borderLeftColor = color;
+                }
+
+                // Mise à jour de l'image
+                const previewImage = document.getElementById('preview-image');
+                if (imageUrl) {
+                    previewImage.src = imageUrl;
+                    previewImage.style.display = 'block';
+                } else {
+                    previewImage.style.display = 'none';
+                }
+
+                // Mise à jour de la miniature
+                const previewThumbnail = document.getElementById('preview-thumbnail');
+                if (thumbnailUrl) {
+                    previewThumbnail.src = thumbnailUrl;
+                    previewThumbnail.style.display = 'block';
+                } else {
+                    previewThumbnail.style.display = 'none';
+                }
+
+                // Mise à jour de la durée
+                let endTimeText = 'bientôt';
+                if (durationValue) {
+                    switch (durationUnit) {
+                        case 'minutes':
+                            endTimeText = `dans ${durationValue} minute(s)`;
+                            break;
+                        case 'hours':
+                            endTimeText = `dans ${durationValue} heure(s)`;
+                            break;
+                        case 'days':
+                            endTimeText = `dans ${durationValue} jour(s)`;
+                            break;
+                        case 'weeks':
+                            endTimeText = `dans ${durationValue} semaine(s)`;
+                            break;
+                    }
+                }
+                document.getElementById('preview-end-time').textContent = endTimeText;
+
+                // Mise à jour du nombre de gagnants
+                document.getElementById('preview-winners').textContent = winnerCount || '1';
+
+                // Mise à jour des conditions
+                let requirements = [];
+                if (document.getElementById('req-role').checked) {
+                    const role = document.getElementById('required-role').value;
+                    const roleName = role ? document.getElementById('required-role').options[document.getElementById('required-role').selectedIndex].text : 'un rôle';
+                    requirements.push(`Avoir le rôle ${roleName}`);
+                }
+                if (document.getElementById('req-level').checked) {
+                    const level = document.getElementById('required-level').value || 'X';
+                    requirements.push(`Niveau ${level} minimum`);
+                }
+                if (document.getElementById('req-message').checked) {
+                    const messages = document.getElementById('required-messages').value || 'X';
+                    requirements.push(`${messages} messages minimum`);
+                }
+
+                document.getElementById('preview-requirements').textContent = requirements.length > 0 ? requirements.join(', ') : 'Aucune';
+            }
+
+            // Ajouter des écouteurs d'événements aux champs de saisie
+            document.getElementById('giveaway-prize').addEventListener('input', updatePreview);
+            document.getElementById('giveaway-description').addEventListener('input', updatePreview);
+            document.getElementById('giveaway-color').addEventListener('input', updatePreview);
+            document.getElementById('giveaway-image').addEventListener('input', updatePreview);
+            document.getElementById('giveaway-thumbnail').addEventListener('input', updatePreview);
+            document.getElementById('duration-value').addEventListener('input', updatePreview);
+            document.getElementById('duration-unit').addEventListener('change', updatePreview);
+            document.getElementById('winner-count').addEventListener('input', updatePreview);
+            document.getElementById('required-role').addEventListener('change', updatePreview);
+            document.getElementById('required-level').addEventListener('input', updatePreview);
+            document.getElementById('required-messages').addEventListener('input', updatePreview);
+
+            // Fonction pour lancer le giveaway
+            document.getElementById('start-giveaway-button').addEventListener('click', async function() {
+                const botToken = document.getElementById('bot-token').value;
+                const channelId = document.getElementById('channel-id').value;
+                const prize = document.getElementById('giveaway-prize').value;
+                const description = document.getElementById('giveaway-description').value;
+                const color = document.getElementById('giveaway-color').value;
+                const imageUrl = document.getElementById('giveaway-image').value;
+                const thumbnailUrl = document.getElementById('giveaway-thumbnail').value;
+                const durationValue = document.getElementById('duration-value').value;
+                const durationUnit = document.getElementById('duration-unit').value;
+                const winnerCount = document.getElementById('winner-count').value;
+
+                // Vérification des champs obligatoires
+                if (!botToken) {
+                    showError("La clé d'authentification du bot est requise !");
+                    return;
+                }
+                if (!channelId) {
+                    showError("Veuillez sélectionner un canal de destination !");
+                    return;
+                }
+                if (!prize) {
+                    showError("Veuillez spécifier un prix pour le giveaway !");
+                    return;
+                }
+                if (!durationValue) {
+                    showError("Veuillez spécifier une durée pour le giveaway !");
+                    return;
+                }
+
+                // Collecte des conditions
+                const requirements = {};
+                if (document.getElementById('req-role').checked) {
+                    requirements.role = document.getElementById('required-role').value;
+                }
+                if (document.getElementById('req-level').checked) {
+                    requirements.level = document.getElementById('required-level').value;
+                }
+                if (document.getElementById('req-message').checked) {
+                    requirements.messages = document.getElementById('required-messages').value;
+                }
+
+                // Calcul de la couleur pour Discord
+                let colorValue = 0;
+                if (color && color.startsWith('#')) {
+                    colorValue = parseInt(color.slice(1), 16);
+                }
+
+                // Construction du payload
+                const payload = {
+                    token: botToken,
+                    channelId: channelId,
+                    giveaway: {
+                        prize: prize,
+                        description: description,
+                        color: colorValue,
+                        imageUrl: imageUrl,
+                        thumbnailUrl: thumbnailUrl,
+                        duration: {
+                            value: parseInt(durationValue),
+                            unit: durationUnit
+                        },
+                        winnerCount: parseInt(winnerCount) || 1,
+                        requirements: requirements
+                    }
+                };
+
+                try {
+                    // Simulation de l'envoi de la requête
+                    // En production, remplacez par un vrai fetch
+                    console.log("Envoi du payload:", payload);
+                    
+                    // Simule une réponse réussie après un délai
+                    setTimeout(() => {
+                        showSuccess("Giveaway lancé avec succès !");
+                    }, 1000);
+                    
+                    // Dans une implémentation réelle, vous feriez:
+                    /*
+                    const response = await fetch('/start-giveaway', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        showSuccess("Giveaway lancé avec succès !");
+                    } else {
+                        const errorData = await response.json().catch(() => ({}));
+                        showError(`Erreur: ${errorData.message || response.statusText}`);
+                    }
+                    */
+                } catch (error) {
+                    showError(`Erreur: ${error.message}`);
+                }
+            });
+
+            // Fonction pour afficher les messages d'erreur
+            function showError(message) {
+                const errorElement = document.getElementById('error-message');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 5000);
+            }
+
+            // Fonction pour afficher les messages de succès
+            function showSuccess(message) {
+                const successElement = document.getElementById('success-message');
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                setTimeout(() => {
+                    successElement.style.display = 'none';
+                }, 5000);
+            }
+
+            // Initialiser l'aperçu
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
