@@ -95,7 +95,7 @@ app.post('/start-giveaway', async (req, res) => {
     const row = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
-          .setCustomId('participer')
+          .setCustomId('participate')
           .setLabel('Participer')
           .setStyle(ButtonStyle.Primary)
       );
@@ -105,7 +105,7 @@ app.post('/start-giveaway', async (req, res) => {
     const collector = message.createMessageComponentCollector({ time: giveaway.duration.value * 60000 });
 
     collector.on('collect', async i => {
-      if (i.customId === 'participer') {
+      if (i.customId === 'participate') {
         await i.reply({ content: 'Vous avez participé au giveaway !', ephemeral: true });
       }
     });
