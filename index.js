@@ -1,10 +1,11 @@
-import { Client, GatewayIntentBits, ActivityType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js'; // Commandes de modération
 import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js'; // Commandes de giveaway
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
+import { handleMessageCreate } from './events/messagePub.js'; // Vérification des messages de pub
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -21,19 +22,14 @@ const client = new Client({
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration CORS avec domaines autorisés
+// Configuration CORS
 const corsOptions = {
-  origin: ['https://startoto1007.github.io', 'http://localhost:3000', 'http://127.0.0.1:5500'], 
+  origin: 'https://startoto1007.github.io', // Remplacez par votre domaine GitHub Pages
   optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-
-// Route de vérification API
-app.get('/', (req, res) => {
-  res.json({ status: 'online', message: 'API du bot OB Zelda opérationnelle' });
-});
 
 // Route pour récupérer la liste des salons
 app.get('/channels', async (req, res) => {
@@ -46,46 +42,33 @@ app.get('/channels', async (req, res) => {
     return res.status(404).json({ error: 'Serveur introuvable.' });
   }
 
-  try {
-    // Discord.js v14+ utilise des constantes numériques pour les types de canaux
-    // 0 représente GUILD_TEXT (salon textuel)
-    const channels = guild.channels.cache
-      .filter(channel => channel.type === 0)
-      .map(channel => ({
-        id: channel.id,
-        name: channel.name,
-      }));
+  const channels = guild.channels.cache.filter(channel => channel.type === 'GUILD_TEXT').map(channel => ({
+    id: channel.id,
+    name: channel.name,
+  }));
 
-    res.json(channels);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des canaux:', error);
-    res.status(500).json({ error: 'Erreur interne du serveur.' });
-  }
+  res.json(channels);
 });
 
 // Route pour envoyer un embed via le bot
 app.post('/send-embed', async (req, res) => {
   const { token, channelId, embed } = req.body;
 
-  // Vérification du token d'authentification
   if (token !== process.env.PANEL_TOKEN) {
-    return res.status(401).json({ error: 'Token d\'authentification invalide.' });
+    return res.status(401).json({ error: 'Token invalide.' });
   }
 
-  // Vérification du canal
   const channel = client.channels.cache.get(channelId);
   if (!channel) {
     return res.status(404).json({ error: 'Salon introuvable.' });
   }
 
   try {
-    // Envoi de l'embed
     await channel.send({ embeds: [embed] });
-    console.log(`Embed envoyé au salon ${channel.name} (${channelId})`);
     res.json({ success: true, message: 'Embed envoyé avec succès!' });
   } catch (error) {
     console.error('Erreur lors de l\'envoi de l\'embed:', error);
-    res.status(500).json({ error: 'Erreur lors de l\'envoi de l\'embed.', details: error.message });
+    res.status(500).json({ error: 'Erreur lors de l\'envoi de l\'embed.' });
   }
 });
 
@@ -93,99 +76,60 @@ app.post('/send-embed', async (req, res) => {
 app.post('/start-giveaway', async (req, res) => {
   const { token, channelId, giveaway } = req.body;
 
-  // Vérification du token d'authentification
   if (token !== process.env.PANEL_TOKEN) {
-    return res.status(401).json({ error: 'Token d\'authentification invalide.' });
+    return res.status(401).json({ error: 'Token invalide.' });
   }
 
-  // Vérification du canal
   const channel = client.channels.cache.get(channelId);
   if (!channel) {
     return res.status(404).json({ error: 'Salon introuvable.' });
   }
 
   try {
-    // Création de l'embed pour le giveaway
     const embed = new EmbedBuilder()
       .setTitle('🎉 Nouveau Giveaway !')
       .setDescription(`Gagnez **${giveaway.prize}** en participant au giveaway !\nNombre de gagnants : **${giveaway.winnerCount}**\nDurée : **${giveaway.duration.value} ${giveaway.duration.unit}**`)
-      .setColor(parseInt(giveaway.color.replace('#', ''), 16) || 0x5a7c46)
+      .setColor(giveaway.color)
       .setTimestamp();
 
-    // Création du bouton pour participer
     const row = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
           .setCustomId('participer')
           .setLabel('Participer')
           .setStyle(ButtonStyle.Primary)
-          .setEmoji('🎉')
       );
 
-    // Envoyer le message de giveaway
     const message = await channel.send({ embeds: [embed], components: [row] });
-    
-    // Calculer la durée en millisecondes
-    let durationMs = giveaway.duration.value;
-    if (giveaway.duration.unit === 'minutes') {
-      durationMs *= 60000;
-    } else if (giveaway.duration.unit === 'heures') {
-      durationMs *= 3600000;
-    } else if (giveaway.duration.unit === 'jours') {
-      durationMs *= 86400000;
-    }
 
-    // Liste des participants
-    const participants = new Set();
-    
-    // Créer un collecteur pour les interactions avec le bouton
-    const collector = message.createMessageComponentCollector({ 
-      time: durationMs 
-    });
+    const collector = message.createMessageComponentCollector({ time: giveaway.duration.value * 60000 });
 
-    // Quand un utilisateur clique sur le bouton
     collector.on('collect', async i => {
       if (i.customId === 'participer') {
-        participants.add(i.user.id);
         await i.reply({ content: 'Vous avez participé au giveaway !', ephemeral: true });
       }
     });
 
-    // Quand le temps est écoulé
-    collector.on('end', async () => {
-      // Convertir le Set en tableau et mélanger
-      const participantsArray = Array.from(participants);
-      const winners = [];
-      
-      // Sélectionner les gagnants aléatoirement
-      for (let i = 0; i < Math.min(giveaway.winnerCount, participantsArray.length); i++) {
-        const randomIndex = Math.floor(Math.random() * participantsArray.length);
-        const selectedId = participantsArray.splice(randomIndex, 1)[0];
-        winners.push(`<@${selectedId}>`);
-      }
+    collector.on('end', async collected => {
+      const winners = collected.users.filter(user => !collected.users.some(other => other.id === user.id));
+      const selectedWinners = winners.sort(() => 0.5 - Math.random()).slice(0, giveaway.winnerCount);
 
-      // Créer l'embed des résultats
       const winnersEmbed = new EmbedBuilder()
         .setTitle('🎉 Résultats du Giveaway !')
-        .setDescription(winners.length > 0 
-          ? `Félicitations aux gagnants :\n${winners.join('\n')}` 
-          : "Personne n'a participé au giveaway...")
-        .setColor(parseInt(giveaway.color.replace('#', ''), 16) || 0x5a7c46)
+        .setDescription(`Félicitations aux gagnants :\n${selectedWinners.map(winner => `- ${winner.tag}`).join('\n')}`)
+        .setColor(giveaway.color)
         .setTimestamp();
 
-      // Envoyer les résultats
       await channel.send({ embeds: [winnersEmbed] });
     });
 
-    console.log(`Giveaway démarré dans le salon ${channel.name} (${channelId})`);
     res.json({ success: true, message: 'Giveaway démarré avec succès!' });
   } catch (error) {
     console.error('Erreur lors du démarrage du giveaway:', error);
-    res.status(500).json({ error: 'Erreur lors du démarrage du giveaway.', details: error.message });
+    res.status(500).json({ error: 'Erreur lors du démarrage du giveaway.' });
   }
 });
 
-// Démarrer le serveur web
 app.listen(PORT, () => {
   console.log(`Serveur web démarré sur le port ${PORT}`);
 });
@@ -220,6 +164,11 @@ client.on('interactionCreate', async (interaction) => {
   } else if (commandName === 'giveaway') {
     await giveawayExecute(interaction);
   }
+});
+
+// Gestionnaire d'événements pour les messages
+client.on('messageCreate', async (message) => {
+  await handleMessageCreate(message);
 });
 
 // Connexion avec le token
