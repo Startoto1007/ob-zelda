@@ -13,7 +13,7 @@ export const handleMessageCreate = async (message) => {
         .setTitle('Erreur')
         .setDescription('Vous n\'avez pas le rôle "Compte vérifié" requis pour poster dans ce salon. Veuillez ouvrir un ticket dans le salon <#1339335025161928724> pour l\'obtenir.')
         .setColor(0xff0000);
-      await message.author.send({ embeds: [errorEmbed], ephemeral: true });
+      await message.channel.send({ embeds: [errorEmbed], ephemeral: true });
       return;
     }
 
@@ -23,7 +23,7 @@ export const handleMessageCreate = async (message) => {
         .setTitle('Erreur')
         .setDescription('Vous avez déjà posté un message de pub aujourd\'hui. Veuillez attendre demain pour reposter votre pub.')
         .setColor(0xff0000);
-      await message.author.send({ embeds: [errorEmbed], ephemeral: true });
+      await message.channel.send({ embeds: [errorEmbed], ephemeral: true });
       return;
     }
 
