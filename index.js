@@ -156,7 +156,7 @@ client.once('ready', async () => {
     if (!guild) return;
 
     const members = await guild.members.fetch();
-    members.forEach(member => {
+    members.forEach(async member => {
       const hasRequiredRoles = [
         '1366003918903050240',
         '1366003499711594567',
