@@ -5,7 +5,8 @@ import { data as moderationCommands, execute as moderationExecute } from './comm
 import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js'; // Commandes de giveaway
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
-import { handleMessageCreate } from './events/messagePub.js'; // Vérification des messages de pub
+import { handleMessageCreate as handleMessagePub } from './events/messagePub.js'; // Vérification des messages de pub
+import { handleMessageCreate as handleVocabularyModeration } from './events/vocabularyModeration.js'; // Modération du vocabulaire
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -16,6 +17,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions,
   ],
 });
 
@@ -147,6 +149,31 @@ client.once('ready', async () => {
 
   // Initialiser les messages planifiés
   scheduledMessages(client);
+
+  // Gérer l'attribution et le retrait automatique du rôle
+  setInterval(async () => {
+    const guild = client.guilds.cache.get(process.env.GUILD_ID);
+    if (!guild) return;
+
+    const members = await guild.members.fetch();
+    members.forEach(member => {
+      const hasRequiredRoles = [
+        '1366003918903050240',
+        '1366003499711594567',
+        '1363773586195611769',
+      ].some(roleId => member.roles.cache.has(roleId));
+
+      if (hasRequiredRoles) {
+        if (member.roles.cache.has('1366051887190642799')) {
+          await member.roles.remove('1366051887190642799');
+        }
+      } else {
+        if (!member.roles.cache.has('1366051887190642799')) {
+          await member.roles.add('1366051887190642799');
+        }
+      }
+    });
+  }, 60000); // Vérifier toutes les minutes
 });
 
 // Initialiser l'événement de bienvenue
@@ -168,7 +195,8 @@ client.on('interactionCreate', async (interaction) => {
 
 // Gestionnaire d'événements pour les messages
 client.on('messageCreate', async (message) => {
-  await handleMessageCreate(message);
+  await handleMessagePub(message);
+  await handleVocabularyModeration(message);
 });
 
 // Connexion avec le token
