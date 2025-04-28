@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 
 export const data = new SlashCommandBuilder()
@@ -54,59 +54,33 @@ export async function execute(interaction) {
   const subcommand = interaction.options.getSubcommand();
   const joueur = interaction.options.getUser('joueur');
   const durée = interaction.options.getString('durée');
+  const raison = interaction.options.getString('raison') || 'Aucune raison spécifiée';
 
-  // Vérifier si l'utilisateur a le rôle "membre de l'OB"
-  const member = interaction.guild.members.cache.get(interaction.user.id);
-  if (!member.roles.cache.has('1339286435475230800')) {
-    return interaction.reply({ content: 'Vous n\'avez pas les permissions nécessaires pour utiliser cette commande.', ephemeral: true });
+  switch (subcommand) {
+    case 'mute':
+      await handleMute(interaction, joueur, durée, raison);
+      break;
+    case 'unmute':
+      await handleUnmute(interaction, joueur);
+      break;
+    case 'ban':
+      await handleBan(interaction, joueur, durée, raison);
+      break;
+    case 'unban':
+      await handleUnban(interaction, joueur);
+      break;
+    case 'kick':
+      await handleKick(interaction, joueur, raison);
+      break;
+    case 'avertissement':
+      await handleAvertissement(interaction, joueur, raison);
+      break;
+    case 'def_ban':
+      await handleDefBan(interaction, joueur, raison);
+      break;
+    default:
+      await interaction.reply({ content: 'Commande inconnue', ephemeral: true });
   }
-
-  // Demander la raison via un formulaire
-  const modal = new ModalBuilder()
-    .setCustomId('moderationForm')
-    .setTitle('Formulaire de modération');
-
-  const raisonInput = new TextInputBuilder()
-    .setCustomId('raisonInput')
-    .setLabel('Raison de la sanction')
-    .setStyle(TextInputStyle.Paragraph);
-
-  const actionRow = new ActionRowBuilder().addComponents(raisonInput);
-  modal.addComponents(actionRow);
-
-  await interaction.showModal(modal);
-
-  const filter = i => i.customId === 'moderationForm';
-  interaction.client.on('interactionCreate', async i => {
-    if (!filter(i)) return;
-    const raison = i.fields.getTextInputValue('raisonInput');
-
-    switch (subcommand) {
-      case 'mute':
-        await handleMute(i, joueur, durée, raison);
-        break;
-      case 'unmute':
-        await handleUnmute(i, joueur);
-        break;
-      case 'ban':
-        await handleBan(i, joueur, durée, raison);
-        break;
-      case 'unban':
-        await handleUnban(i, joueur);
-        break;
-      case 'kick':
-        await handleKick(i, joueur, raison);
-        break;
-      case 'avertissement':
-        await handleAvertissement(i, joueur, raison);
-        break;
-      case 'def_ban':
-        await handleDefBan(i, joueur, raison);
-        break;
-      default:
-        await i.reply({ content: 'Commande inconnue', ephemeral: true });
-    }
-  });
 }
 
 async function handleMute(interaction, joueur, durée, raison) {
@@ -174,6 +148,13 @@ async function handleBan(interaction, joueur, durée, raison) {
   }
 
   try {
+    const embed = new EmbedBuilder()
+      .setTitle('Vous avez été banni temporairement')
+      .setDescription(`Raison : ${raison}\nDurée : ${formatDuration(durationMs)}`)
+      .setColor(0xff0000);
+
+    await joueur.send({ embeds: [embed] }).catch(() => {});
+
     await member.ban({ reason: raison, deleteMessageSeconds: durationMs / 1000 });
     await interaction.reply({ content: `Membre ${joueur.tag} banni pour ${durée}.`, ephemeral: true });
 
@@ -264,6 +245,13 @@ async function handleDefBan(interaction, joueur, raison) {
   }
 
   try {
+    const embed = new EmbedBuilder()
+      .setTitle('Vous avez été banni définitivement')
+      .setDescription(`Raison : ${raison}`)
+      .setColor(0xff0000);
+
+    await joueur.send({ embeds: [embed] }).catch(() => {});
+
     await member.ban({ reason: raison });
     await interaction.reply({ content: `Membre ${joueur.tag} banni définitivement.`, ephemeral: true });
 
@@ -297,26 +285,24 @@ function parseDuration(duration) {
 }
 
 function createModEmbed(moderator, target, action, duration, reason) {
-  return {
-    color: 0x0099ff,
-    title: `Action de modération: ${action}`,
-    fields: [
+  return new EmbedBuilder()
+    .setColor(0x0099ff)
+    .setTitle(`Action de modération: ${action}`)
+    .addFields(
       { name: 'Modérateur', value: moderator.tag, inline: true },
       { name: 'Membre', value: target.tag, inline: true },
       { name: 'Durée', value: duration || 'N/A', inline: true },
-      { name: 'Raison', value: reason },
-    ],
-    timestamp: new Date().toISOString(),
-  };
+      { name: 'Raison', value: reason }
+    )
+    .setTimestamp(new Date().toISOString());
 }
 
 function createDMEmbed(target, duration, reason) {
-  return {
-    color: 0xff0000,
-    title: 'Vous avez été sanctionné',
-    description: `Raison: ${reason}\nDurée: ${duration || 'N/A'}`,
-    timestamp: new Date().toISOString(),
-  };
+  return new EmbedBuilder()
+    .setColor(0xff0000)
+    .setTitle('Vous avez été sanctionné')
+    .setDescription(`Raison: ${reason}\nDurée: ${duration || 'N/A'}`)
+    .setTimestamp(new Date().toISOString());
 }
 
 async function addSanctionToHistory(userId, type, duration, reason, moderator) {
@@ -336,17 +322,19 @@ async function checkCumulativeSanctions(userId, interaction) {
   const avertissementCount = sanctions.filter(sanction => sanction.type === 'Avertissement').length;
 
   if (avertissementCount >= 3) {
-    await handleMute(interaction, interaction.guild.members.cache.get(userId), '3h', '3 avertissements cumulés');
+    await handleMute(interaction, interaction.guild.members.cache.get(userId), '1h', '3 avertissements cumulés');
   } else if (avertissementCount >= 5) {
     await handleMute(interaction, interaction.guild.members.cache.get(userId), '1d', '5 avertissements cumulés');
   } else if (avertissementCount >= 10) {
     await handleMute(interaction, interaction.guild.members.cache.get(userId), '1w', '10 avertissements cumulés');
+  } else if (avertissementCount >= 15) {
+    await handleBan(interaction, interaction.guild.members.cache.get(userId), '2w', '15 avertissements cumulés');
   } else if (avertissementCount >= 20) {
     await handleBan(interaction, interaction.guild.members.cache.get(userId), '1m', '20 avertissements cumulés');
+  } else if (avertissementCount >= 25) {
+    await handleBan(interaction, interaction.guild.members.cache.get(userId), '2m', '25 avertissements cumulés');
   } else if (avertissementCount >= 30) {
-    await handleBan(interaction, interaction.guild.members.cache.get(userId), '1m', '30 avertissements cumulés');
-  } else if (avertissementCount >= 50) {
-    await handleDefBan(interaction, interaction.guild.members.cache.get(userId), '50 avertissements cumulés');
+    await handleDefBan(interaction, interaction.guild.members.cache.get(userId), '30 avertissements cumulés');
   }
 }
 
@@ -355,3 +343,19 @@ async function getSanctionsFromHistory(userId) {
   // Par exemple, vous pouvez utiliser une base de données ou un fichier JSON
   return [];
 }
+
+function formatDuration(durationMs) {
+  const seconds = Math.floor(durationMs / 1000) % 60;
+  const minutes = Math.floor(durationMs / (1000 * 60)) % 60;
+  const hours = Math.floor(durationMs / (1000 * 60 * 60)) % 24;
+  const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+
+  const parts = [];
+  if (days > 0) parts.push(`${days} jour(s)`);
+  if (hours > 0) parts.push(`${hours} heure(s)`);
+  if (minutes > 0) parts.push(`${minutes} minute(s)`);
+  if (seconds > 0) parts.push(`${seconds} seconde(s)`);
+
+  return parts.join(' ');
+}
+
