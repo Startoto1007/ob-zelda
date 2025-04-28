@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { setTimeout } from 'timers/promises';
+import { addSanctionToHistory, checkCumulativeSanctions, removeSanctionFromHistory } from '../utils/sanctionHistory.js';
 
 export const data = new SlashCommandBuilder()
   .setName('moderation')
@@ -102,7 +103,7 @@ async function handleMute(interaction, joueur, durée, raison) {
     await interaction.guild.channels.cache.get('1349788945554079784').send({ embeds: [modEmbed] });
 
     const dmEmbed = createDMEmbed(joueur, durée, raison);
-    await joueur.send({ embeds: [dmEmbed] }).catch(() => {});
+    await joueur.send({ embeds: [dmEmbed], ephemeral: true }).catch(() => {});
 
     // Ajouter à l'historique des sanctions
     await addSanctionToHistory(joueur.id, 'Mute', durée, raison, interaction.user);
@@ -123,7 +124,7 @@ async function handleUnmute(interaction, joueur) {
 
   try {
     await member.timeout(null);
-    await interaction.reply({ content: `Membre ${joueur.tag} unmute.`, ephemeral: true });
+    await interaction.reply({ content: `Membre ${joueur.tag} unmuté.`, ephemeral: true });
 
     const modEmbed = createModEmbed(interaction.user, joueur, 'Unmute', 'N/A', 'Unmute par un modérateur');
     await interaction.guild.channels.cache.get('1349788945554079784').send({ embeds: [modEmbed] });
@@ -153,8 +154,7 @@ async function handleBan(interaction, joueur, durée, raison) {
       .setDescription(`Raison : ${raison}\nDurée : ${formatDuration(durationMs)}`)
       .setColor(0xff0000);
 
-    await joueur.send({ embeds: [embed] }).catch(() => {});
-
+    await joueur.send({ embeds: [embed], ephemeral: true }).catch(() => {});
     await member.ban({ reason: raison, deleteMessageSeconds: durationMs / 1000 });
     await interaction.reply({ content: `Membre ${joueur.tag} banni pour ${durée}.`, ephemeral: true });
 
@@ -225,7 +225,7 @@ async function handleAvertissement(interaction, joueur, raison) {
     await interaction.guild.channels.cache.get('1349788945554079784').send({ embeds: [modEmbed] });
 
     const dmEmbed = createDMEmbed(joueur, 'N/A', raison);
-    await joueur.send({ embeds: [dmEmbed] }).catch(() => {});
+    await joueur.send({ embeds: [dmEmbed], ephemeral: true }).catch(() => {});
 
     // Ajouter à l'historique des sanctions
     await addSanctionToHistory(joueur.id, 'Avertissement', 'N/A', raison, interaction.user);
@@ -250,8 +250,7 @@ async function handleDefBan(interaction, joueur, raison) {
       .setDescription(`Raison : ${raison}`)
       .setColor(0xff0000);
 
-    await joueur.send({ embeds: [embed] }).catch(() => {});
-
+    await joueur.send({ embeds: [embed], ephemeral: true }).catch(() => {});
     await member.ban({ reason: raison });
     await interaction.reply({ content: `Membre ${joueur.tag} banni définitivement.`, ephemeral: true });
 
@@ -304,58 +303,3 @@ function createDMEmbed(target, duration, reason) {
     .setDescription(`Raison: ${reason}\nDurée: ${duration || 'N/A'}`)
     .setTimestamp(new Date().toISOString());
 }
-
-async function addSanctionToHistory(userId, type, duration, reason, moderator) {
-  // Votre logique pour ajouter une sanction à l'historique
-  // Par exemple, vous pouvez utiliser une base de données ou un fichier JSON
-}
-
-async function removeSanctionFromHistory(userId, type) {
-  // Votre logique pour supprimer une sanction de l'historique
-  // Par exemple, vous pouvez utiliser une base de données ou un fichier JSON
-}
-
-async function checkCumulativeSanctions(userId, interaction) {
-  // Votre logique pour vérifier les sanctions cumulées
-  // Par exemple, vous pouvez utiliser une base de données ou un fichier JSON
-  const sanctions = await getSanctionsFromHistory(userId);
-  const avertissementCount = sanctions.filter(sanction => sanction.type === 'Avertissement').length;
-
-  if (avertissementCount >= 3) {
-    await handleMute(interaction, interaction.guild.members.cache.get(userId), '1h', '3 avertissements cumulés');
-  } else if (avertissementCount >= 5) {
-    await handleMute(interaction, interaction.guild.members.cache.get(userId), '1d', '5 avertissements cumulés');
-  } else if (avertissementCount >= 10) {
-    await handleMute(interaction, interaction.guild.members.cache.get(userId), '1w', '10 avertissements cumulés');
-  } else if (avertissementCount >= 15) {
-    await handleBan(interaction, interaction.guild.members.cache.get(userId), '2w', '15 avertissements cumulés');
-  } else if (avertissementCount >= 20) {
-    await handleBan(interaction, interaction.guild.members.cache.get(userId), '1m', '20 avertissements cumulés');
-  } else if (avertissementCount >= 25) {
-    await handleBan(interaction, interaction.guild.members.cache.get(userId), '2m', '25 avertissements cumulés');
-  } else if (avertissementCount >= 30) {
-    await handleDefBan(interaction, interaction.guild.members.cache.get(userId), '30 avertissements cumulés');
-  }
-}
-
-async function getSanctionsFromHistory(userId) {
-  // Votre logique pour obtenir les sanctions de l'historique
-  // Par exemple, vous pouvez utiliser une base de données ou un fichier JSON
-  return [];
-}
-
-function formatDuration(durationMs) {
-  const seconds = Math.floor(durationMs / 1000) % 60;
-  const minutes = Math.floor(durationMs / (1000 * 60)) % 60;
-  const hours = Math.floor(durationMs / (1000 * 60 * 60)) % 24;
-  const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
-
-  const parts = [];
-  if (days > 0) parts.push(`${days} jour(s)`);
-  if (hours > 0) parts.push(`${hours} heure(s)`);
-  if (minutes > 0) parts.push(`${minutes} minute(s)`);
-  if (seconds > 0) parts.push(`${seconds} seconde(s)`);
-
-  return parts.join(' ');
-}
-
