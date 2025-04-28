@@ -1,6 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
 import { setTimeout } from 'timers/promises';
-import { addSanctionToHistory, checkCumulativeSanctions } from '../utils/sanctionHistory.js'; // Assurez-vous d'avoir ce fichier pour gérer l'historique des sanctions
+import { addSanctionToHistory, checkCumulativeSanctions } from '../utils/sanctionHistory.js';
 
 // Liste des gros mots à surveiller
 const BAD_WORDS = ['grosmot1', 'grosmot2', 'grosmot3']; // Remplacez par les mots que vous souhaitez surveiller
