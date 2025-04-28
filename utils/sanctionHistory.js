@@ -43,7 +43,7 @@ export async function checkCumulativeSanctions(userId, interaction) {
   } else if (avertissementCount >= 10) {
     await handleMute(interaction.guild.members.cache.get(userId), '10 avertissements cumulés', 604800000); // 1 semaine
   } else if (avertissementCount >= 15) {
-    await handleMute(interaction.guild.members.cache.get(userId), '15 avertissements cumulés', 1209600000); // 2 semaines
+    await handleBan(interaction.guild.members.cache.get(userId), '15 avertissements cumulés', 1209600000); // 2 semaines
   } else if (avertissementCount >= 20) {
     await handleBan(interaction.guild.members.cache.get(userId), '20 avertissements cumulés', 2592000000); // 1 mois
   } else if (avertissementCount >= 25) {
