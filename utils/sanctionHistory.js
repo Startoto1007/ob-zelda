@@ -1,6 +1,11 @@
 import { setTimeout } from 'timers/promises';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Création des équivalents de __dirname et __filename pour ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SANCTIONS_FILE = path.join(__dirname, 'sanctions.json');
 
