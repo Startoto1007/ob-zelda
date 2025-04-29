@@ -2,7 +2,28 @@ import { EmbedBuilder } from 'discord.js';
 import { addSanctionToHistory, checkCumulativeSanctions } from '../utils/sanctionHistory.js';
 
 // Liste des gros mots à surveiller
-const BAD_WORDS = ['grosmot1', 'grosmot2', 'grosmot3']; // Remplacez par les mots que vous souhaitez surveiller
+const BAD_WORDS = ['abruti', 'idiot', 'stupide', 'con', 'connard', 'connasse', 'merde',
+  'putain', 'salope', 'enculé', 'nique', 'bordel', 'chiant', 'chiotte',
+  'bite', 'couille', 'cul', 'pédé', 'tafiole', 'gouine', 'grognasse',
+  'fdp', 'ntm', 'tg', 'ta gueule', 'zizi', 'trouduc', 'encule', 'branleur',
+  'salaud', 'pute', 'débile', 'dégueulasse', 'enfoiré', 'casse-toi',
+  'bouffon', 'crétin', 'baltringue', 'batard', 'racaille', 'porc', 'p*tain', 'p_tain', 'put1', 'pxtain', 'putain', 'p.tain', 'p*tin',
+  'm*rde', 'm3rde', 'merd*', 'm.rde',
+  'n*que', 'n1que', 'niq*e', 'niq1e',
+  's*lope', 'sal*pe', 's@lope', 's4lope',
+  'c*nnard', 'c0nnard', 'conn*rd', 'conna*d',
+  'enc*lé', 'encu*é', 'encul3', 'enculé', 'encul*',
+  'f*ck', 'f4ck', 'fu*k', 'f.ck', 'f***',
+  'b*te', 'b1te', 'b!te', 'b.i.t.e',
+  'c**', 'c*ul', 'cul*', 'c.l', 'c*u*l',
+  't*gueule', 'tg', 't@gueule', 'ta g*eule',
+  's*laud', 's@laud',
+  'fd*p', 'f-d-p', 'f.d.p', 'f d p',
+  'nt*m', 'n.t.m', 'n-t-m',
+  'br*nleur', 'br4nleur', 'b**nleur',
+  'b*tard', 'bat*rd', 'b@tard',
+  'tr*uduc', 'troud*k', 'trou.d.c',
+  'c*nnasse', 'conn4sse', 'c0nnasse']; // Remplacez par les mots que vous souhaitez surveiller
 
 /**
  * Gère la détection des gros mots dans les messages
