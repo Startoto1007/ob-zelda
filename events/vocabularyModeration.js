@@ -42,6 +42,9 @@ export const handleMessageCreate = async (message) => {
       // Récupérer le membre
       const member = message.guild.members.cache.get(message.author.id);
       if (!member) return;
+
+      // Si le membre a le rôle exempté, ne rien faire
+      if (member.roles.cache.has('1339286435475230800')) return;
       
       // Supprimer le message contenant le mot inapproprié
       await message.delete().catch(err => console.error('Impossible de supprimer le message:', err));
