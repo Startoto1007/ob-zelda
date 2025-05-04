@@ -25,7 +25,7 @@ export async function execute(interaction) {
   }
 
   const choice = interaction.options.getString('musique');
-  const voiceChannel = interaction.guild.channels.cache.get('1368196795448037386');
+  const voiceChannel = interaction.guild.channels.cache.get('1368627117683638333');
 
   if (!voiceChannel || voiceChannel.type !== 2) {
     return interaction.reply({ content: '❌ Le salon vocal de conférence est introuvable.', ephemeral: true });
