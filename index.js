@@ -1,12 +1,13 @@
 import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
-import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
-import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js'; // Commandes de modération
-import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js'; // Commandes de giveaway
-import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
-import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
-import { handleMessageCreate as handleMessagePub } from './events/messagePub.js'; // Vérification des messages de pub
-import { handleMessageCreate as handleVocabularyModeration } from './events/vocabularyModeration.js'; // Modération du vocabulaire
+import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js';
+import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js';
+import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js';
+import { data as musiquePlayCommand, execute as musiquePlayExecute } from './commands/musiquePlay.js';
+import memberJoin from './events/memberJoin.js';
+import scheduledMessages from './events/scheduledMessages.js';
+import { handleMessageCreate as handleMessagePub } from './events/messagePub.js';
+import { handleMessageCreate as handleVocabularyModeration } from './events/vocabularyModeration.js';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -18,52 +19,40 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates
   ],
 });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration CORS
 const corsOptions = {
-  origin: 'https://startoto1007.github.io', // Remplacez par votre domaine GitHub Pages
+  origin: 'https://startoto1007.github.io',
   optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-// Route pour récupérer la liste des salons
 app.get('/channels', async (req, res) => {
-  if (!client.isReady()) {
-    return res.status(503).json({ error: 'Le bot n\'est pas encore prêt.' });
-  }
+  if (!client.isReady()) return res.status(503).json({ error: 'Le bot n\'est pas encore prêt.' });
 
   const guild = client.guilds.cache.get(process.env.GUILD_ID);
-  if (!guild) {
-    return res.status(404).json({ error: 'Serveur introuvable.' });
-  }
+  if (!guild) return res.status(404).json({ error: 'Serveur introuvable.' });
 
-  const channels = guild.channels.cache.filter(channel => channel.type === 'GUILD_TEXT').map(channel => ({
-    id: channel.id,
-    name: channel.name,
-  }));
+  const channels = guild.channels.cache
+    .filter(channel => channel.type === 0) // GUILD_TEXT
+    .map(channel => ({ id: channel.id, name: channel.name }));
 
   res.json(channels);
 });
 
-// Route pour envoyer un embed via le bot
 app.post('/send-embed', async (req, res) => {
   const { token, channelId, embed } = req.body;
-
-  if (token !== process.env.PANEL_TOKEN) {
-    return res.status(401).json({ error: 'Token invalide.' });
-  }
+  if (token !== process.env.PANEL_TOKEN) return res.status(401).json({ error: 'Token invalide.' });
 
   const channel = client.channels.cache.get(channelId);
-  if (!channel) {
-    return res.status(404).json({ error: 'Salon introuvable.' });
-  }
+  if (!channel) return res.status(404).json({ error: 'Salon introuvable.' });
 
   try {
     await channel.send({ embeds: [embed] });
@@ -74,23 +63,17 @@ app.post('/send-embed', async (req, res) => {
   }
 });
 
-// Route pour démarrer un giveaway
 app.post('/start-giveaway', async (req, res) => {
   const { token, channelId, giveaway } = req.body;
-
-  if (token !== process.env.PANEL_TOKEN) {
-    return res.status(401).json({ error: 'Token invalide.' });
-  }
+  if (token !== process.env.PANEL_TOKEN) return res.status(401).json({ error: 'Token invalide.' });
 
   const channel = client.channels.cache.get(channelId);
-  if (!channel) {
-    return res.status(404).json({ error: 'Salon introuvable.' });
-  }
+  if (!channel) return res.status(404).json({ error: 'Salon introuvable.' });
 
   try {
     const embed = new EmbedBuilder()
       .setTitle('🎉 Nouveau Giveaway !')
-      .setDescription(`Gagnez **${giveaway.prize}** en participant au giveaway !\nNombre de gagnants : **${giveaway.winnerCount}**\nDurée : **${giveaway.duration.value} ${giveaway.duration.unit}**`)
+      .setDescription(`Gagnez **${giveaway.prize}**\nNombre de gagnants : **${giveaway.winnerCount}**\nDurée : **${giveaway.duration.value} ${giveaway.duration.unit}**`)
       .setColor(giveaway.color)
       .setTimestamp();
 
@@ -113,12 +96,10 @@ app.post('/start-giveaway', async (req, res) => {
     });
 
     collector.on('end', async collected => {
-      const winners = collected.users.filter(user => !collected.users.some(other => other.id === user.id));
-      const selectedWinners = winners.sort(() => 0.5 - Math.random()).slice(0, giveaway.winnerCount);
-
+      const winners = collected.users.map(user => user).sort(() => 0.5 - Math.random()).slice(0, giveaway.winnerCount);
       const winnersEmbed = new EmbedBuilder()
         .setTitle('🎉 Résultats du Giveaway !')
-        .setDescription(`Félicitations aux gagnants :\n${selectedWinners.map(winner => `- ${winner.tag}`).join('\n')}`)
+        .setDescription(`Félicitations :\n${winners.map(w => `- ${w.tag}`).join('\n')}`)
         .setColor(giveaway.color)
         .setTimestamp();
 
@@ -136,21 +117,20 @@ app.listen(PORT, () => {
   console.log(`Serveur web démarré sur le port ${PORT}`);
 });
 
-// Quand le bot est prêt, on enregistre les commandes et définit le statut
 client.once('ready', async () => {
   console.log(`Bot connecté en tant que ${client.user.tag}`);
-
-  // Définir le statut d'activité
   client.user.setActivity('Créé par l\'OB Zelda', { type: ActivityType.Listening });
 
-  // Enregistrer les commandes globalement
-  await client.application.commands.set([prestigeCommand, moderationCommands, giveawayCommands]);
-  console.log('Commandes enregistrées!');
+  await client.application.commands.set([
+    prestigeCommand,
+    moderationCommands,
+    giveawayCommands,
+    musiquePlayCommand
+  ]);
 
-  // Initialiser les messages planifiés
+  console.log('Commandes enregistrées!');
   scheduledMessages(client);
 
-  // Gérer l'attribution et le retrait automatique du rôle
   setInterval(async () => {
     const guild = client.guilds.cache.get(process.env.GUILD_ID);
     if (!guild) return;
@@ -173,31 +153,28 @@ client.once('ready', async () => {
         }
       }
     });
-  }, 60000); // Vérifier toutes les minutes
+  }, 60000);
 });
 
-// Initialiser l'événement de bienvenue
 memberJoin(client);
 
-// Exécution des commandes (ici, pour /prestige, /moderation et /giveaway)
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
-  const commandName = interaction.commandName;
-  if (commandName === 'prestige') {
+  if (interaction.commandName === 'prestige') {
     await prestigeExecute(interaction);
-  } else if (commandName === 'moderation') {
+  } else if (interaction.commandName === 'moderation') {
     await moderationExecute(interaction);
-  } else if (commandName === 'giveaway') {
+  } else if (interaction.commandName === 'giveaway') {
     await giveawayExecute(interaction);
+  } else if (interaction.commandName === 'jouer-musique') {
+    await musiquePlayExecute(interaction);
   }
 });
 
-// Gestionnaire d'événements pour les messages
 client.on('messageCreate', async (message) => {
   await handleMessagePub(message);
   await handleVocabularyModeration(message);
 });
 
-// Connexion avec le token
 client.login(process.env.DISCORD_TOKEN);
