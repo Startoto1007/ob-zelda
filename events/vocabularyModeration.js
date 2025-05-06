@@ -2,7 +2,7 @@ import { EmbedBuilder } from 'discord.js';
 import { addSanctionToHistory, checkCumulativeSanctions } from '../utils/sanctionHistory.js';
 
 // Liste des gros mots à surveiller
-const BAD_WORDS = ['abruti', 'idiot', 'stupide', 'con', 'connard', 'connasse', 'merde',
+const BAD_WORDS = ['abruti', 'idiot', 'stupide', 'connard', 'connasse', 'merde',
   'putain', 'salope', 'enculé', 'nique', 'bordel', 'chiant', 'chiotte',
   'bite', 'couille', 'cul', 'pédé', 'tafiole', 'gouine', 'grognasse',
   'fdp', 'ntm', 'tg', 'ta gueule', 'zizi', 'trouduc', 'encule', 'branleur',
