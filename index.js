@@ -2,7 +2,6 @@ import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js'; // Commandes de modération
-import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js'; // Commandes de giveaway
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
 import { handleMessageCreate as handleMessagePub } from './events/messagePub.js'; // Vérification des messages de pub
@@ -28,8 +27,7 @@ client.once('ready', async () => {
   // Enregistrer les commandes globalement
   await client.application.commands.set([
     prestigeCommand, 
-    moderationCommands, 
-    giveawayCommands
+    moderationCommands
   ]);
   console.log('Commandes enregistrées!');
   
@@ -78,9 +76,6 @@ client.on('interactionCreate', async (interaction) => {
         break;
       case 'moderation':
         await moderationExecute(interaction);
-        break;
-      case 'giveaway':
-        await giveawayExecute(interaction);
         break;
     }
   } catch (error) {
