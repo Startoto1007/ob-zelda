@@ -5,9 +5,35 @@ export const data = new SlashCommandBuilder()
   .setDescription('Lancer un concours')
   .addStringOption(option => option.setName('prix').setDescription('Le prix du concours').setRequired(true))
   .addIntegerOption(option => option.setName('gagnants').setDescription('Nombre de gagnants').setRequired(true))
-  .addIntegerOption(option => option.setName('durée').setDescription('Durée du concours en minutes').setRequired(true))
+  .addStringOption(option => 
+    option.setName('date_fin')
+          .setDescription('Date et heure de fin du concours (format: JJ/MM/AAAA HH:MM)')
+          .setRequired(true)
+  )
   .addRoleOption(option => option.setName('rôle_requis').setDescription('Rôle requis pour participer (facultatif)').setRequired(false))
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles);
+
+// Fonction pour analyser la date fournie par l'utilisateur
+function parseDate(dateStr) {
+  // Format attendu: JJ/MM/AAAA HH:MM
+  const regex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
+  const match = dateStr.match(regex);
+  
+  if (!match) return null;
+  
+  const day = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10) - 1; // Les mois en JS sont indexés à partir de 0
+  const year = parseInt(match[3], 10);
+  const hour = parseInt(match[4], 10);
+  const minute = parseInt(match[5], 10);
+  
+  // Vérifier que les valeurs sont dans les plages acceptables
+  if (month < 0 || month > 11 || day < 1 || day > 31 || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    return null;
+  }
+  
+  return new Date(year, month, day, hour, minute);
+}
 
 export async function execute(interaction) {
   // Vérifier si l'utilisateur a le rôle "membre de l'OB"
@@ -18,15 +44,33 @@ export async function execute(interaction) {
 
   const prix = interaction.options.getString('prix');
   const gagnants = interaction.options.getInteger('gagnants');
-  const durée = interaction.options.getInteger('durée');
+  const dateFinStr = interaction.options.getString('date_fin');
   const rôleRequis = interaction.options.getRole('rôle_requis');
+  
+  // Convertir la date de fin en objet Date
+  const dateFin = parseDate(dateFinStr);
+  if (!dateFin) {
+    return interaction.reply({ content: 'Format de date invalide. Utilisez le format JJ/MM/AAAA HH:MM', ephemeral: true });
+  }
+  
+  // Vérifier que la date est dans le futur
+  const now = new Date();
+  if (dateFin <= now) {
+    return interaction.reply({ content: 'La date de fin doit être dans le futur.', ephemeral: true });
+  }
+  
+  // Calculer la durée en millisecondes
+  const duréeMs = dateFin.getTime() - now.getTime();
 
   // Variable pour stocker les participants
   const participants = new Set();
 
   // Créer l'embed pour le concours
   const createEmbed = (participantsCount = 0) => {
-    let description = `Gagnez **${prix}** en participant au concours !\nNombre de gagnants : **${gagnants}**\nDurée : **${durée} minutes**\nParticipants : **${participantsCount}**`;
+    // Formater la date de fin pour l'affichage
+    const dateFinFormatted = `${dateFin.toLocaleDateString('fr-FR')} à ${dateFin.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}`;
+    
+    let description = `Gagnez **${prix}** en participant au concours !\nNombre de gagnants : **${gagnants}**\nSe termine le : **${dateFinFormatted}**\nParticipants : **${participantsCount}**`;
     
     if (rôleRequis) {
       description += `\nRôle requis : **${rôleRequis.name}**`;
@@ -36,6 +80,7 @@ export async function execute(interaction) {
       .setTitle('🎉 Nouveau Concours !')
       .setDescription(description)
       .setColor(0x0099ff)
+      .setFooter({ text: `Fin du concours le ${dateFinFormatted}` })
       .setTimestamp();
   };
 
@@ -58,7 +103,7 @@ export async function execute(interaction) {
   const message = await channel.send({ embeds: [embed], components: [row] });
 
   // Ajouter un collecteur pour le bouton
-  const collector = message.createMessageComponentCollector({ time: durée * 60000 });
+  const collector = message.createMessageComponentCollector({ time: duréeMs });
 
   collector.on('collect', async i => {
     if (i.customId === 'participer') {
