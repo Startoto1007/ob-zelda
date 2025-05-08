@@ -11,7 +11,6 @@ import path from 'path';
 
 const giveawaysFilePath = path.resolve('./giveaways.json');
 
-// Fonction pour lire les giveaways depuis le fichier JSON
 function readGiveaways() {
   try {
     if (!fs.existsSync(giveawaysFilePath)) {
@@ -25,7 +24,6 @@ function readGiveaways() {
   }
 }
 
-// Fonction pour écrire les giveaways dans le fichier JSON
 function writeGiveaways(giveaways) {
   try {
     fs.writeFileSync(giveawaysFilePath, JSON.stringify(giveaways, null, 2));
@@ -34,21 +32,18 @@ function writeGiveaways(giveaways) {
   }
 }
 
-// Fonction pour analyser la date fournie par l'utilisateur
 function parseDate(dateStr) {
-  // Format attendu: JJ/MM/AAAA HH:MM
   const regex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
   const match = dateStr.match(regex);
 
   if (!match) return null;
 
   const day = parseInt(match[1], 10);
-  const month = parseInt(match[2], 10) - 1; // Les mois en JS sont indexés à partir de 0
+  const month = parseInt(match[2], 10) - 1;
   const year = parseInt(match[3], 10);
   const hour = parseInt(match[4], 10);
   const minute = parseInt(match[5], 10);
 
-  // Vérifier que les valeurs sont dans les plages acceptables
   if (
     month < 0 || month > 11 ||
     day < 1 || day > 31 ||
@@ -83,7 +78,6 @@ export const data = new SlashCommandBuilder()
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles);
 
 export async function execute(interaction) {
-  // Vérifier si l'utilisateur a le rôle "membre de l'OB"
   const member = interaction.guild.members.cache.get(interaction.user.id);
   if (!member.roles.cache.has('1339286435475230800')) {
     return interaction.reply({
@@ -96,9 +90,8 @@ export async function execute(interaction) {
   const gagnants = interaction.options.getInteger('gagnants');
   const dateFinStr = interaction.options.getString('date_fin');
   const rôleRequis = interaction.options.getRole('rôle_requis');
-
-  // Convertir la date de fin en objet Date
   const dateFin = parseDate(dateFinStr);
+
   if (!dateFin) {
     return interaction.reply({
       content: 'Format de date invalide. Utilisez le format JJ/MM/AAAA HH:MM',
@@ -106,7 +99,6 @@ export async function execute(interaction) {
     });
   }
 
-  // Vérifier que la date est dans le futur
   const now = new Date();
   if (dateFin <= now) {
     return interaction.reply({
@@ -115,13 +107,9 @@ export async function execute(interaction) {
     });
   }
 
-  // Calculer la durée en millisecondes
   const duréeMs = dateFin.getTime() - now.getTime();
-
-  // Variable pour stocker les participants
   const participants = new Set();
 
-  // Créer l'embed pour le concours
   const createEmbed = (participantsCount = 0) => {
     const maintenant = new Date();
     const tempsRestantMs = dateFin - maintenant;
@@ -146,7 +134,6 @@ export async function execute(interaction) {
       .setTimestamp();
   };
 
-  // Créer le bouton pour participer
   const row = new ActionRowBuilder()
     .addComponents(
       new ButtonBuilder()
@@ -155,8 +142,7 @@ export async function execute(interaction) {
         .setStyle(ButtonStyle.Primary)
     );
 
-  // Envoyer le message du concours
-  const channel = interaction.guild.channels.cache.get('1339304412509769729'); // ID du salon pour les concours
+  const channel = interaction.guild.channels.cache.get('1339304412509769729');
   if (!channel) {
     return interaction.reply({
       content: 'Salon introuvable.',
@@ -167,7 +153,6 @@ export async function execute(interaction) {
   const embed = createEmbed(0);
   const message = await channel.send({ embeds: [embed], components: [row] });
 
-  // Sauvegarder les informations du concours
   const giveaways = readGiveaways();
   giveaways.push({
     messageId: message.id,
@@ -182,18 +167,15 @@ export async function execute(interaction) {
   });
   writeGiveaways(giveaways);
 
-  // Ajouter un collecteur pour le bouton
   const collector = message.createMessageComponentCollector({ time: duréeMs });
 
   collector.on('collect', async i => {
     if (i.customId === 'participer') {
-      // Vérifier si l'utilisateur a déjà participé
       if (participants.has(i.user.id)) {
         await i.reply({ content: 'Vous participez déjà à ce concours !', ephemeral: true });
         return;
       }
 
-      // Vérifier si l'utilisateur a le rôle requis (s'il y en a un)
       if (rôleRequis) {
         const memberInteraction = i.guild.members.cache.get(i.user.id);
         if (!memberInteraction.roles.cache.has(rôleRequis.id)) {
@@ -205,19 +187,14 @@ export async function execute(interaction) {
         }
       }
 
-      // Ajouter l'utilisateur aux participants
       participants.add(i.user.id);
-
-      // Mettre à jour l'embed avec le nouveau nombre de participants
       const updatedEmbed = createEmbed(participants.size);
       await message.edit({ embeds: [updatedEmbed], components: [row] });
-
       await i.reply({ content: 'Vous avez participé au concours !', ephemeral: true });
     }
   });
 
   collector.on('end', async () => {
-    // Désactiver le bouton
     const disabledRow = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
@@ -229,7 +206,6 @@ export async function execute(interaction) {
 
     await message.edit({ components: [disabledRow] });
 
-    // Sélectionner les gagnants
     if (participants.size === 0) {
       const noWinnersEmbed = new EmbedBuilder()
         .setTitle('🎉 Résultats du Concours !')
@@ -241,13 +217,8 @@ export async function execute(interaction) {
       return;
     }
 
-    // Convertir le Set en Array pour pouvoir sélectionner aléatoirement
     const participantsArray = Array.from(participants);
-
-    // Déterminer le nombre de gagnants (ne peut pas dépasser le nombre de participants)
     const winnerCount = Math.min(gagnants, participantsArray.length);
-
-    // Sélectionner les gagnants aléatoirement
     const selectedWinners = [];
     const winnerIds = new Set();
 
@@ -256,7 +227,22 @@ export async function execute(interaction) {
       const winnerId = participantsArray[randomIndex];
 
       if (!winnerIds.has(winnerId)) {
-        winner
-::contentReference[oaicite:11]{index=11}
- 
+        winnerIds.add(winnerId);
+        selectedWinners.push(`<@${winnerId}>`);
+      }
+    }
 
+    const winnersEmbed = new EmbedBuilder()
+      .setTitle('🎉 Résultats du Concours !')
+      .setDescription(`Félicitations à nos ${selectedWinners.length} gagnant(s) pour **${prix}** :\n\n${selectedWinners.join('\n')}`)
+      .setColor(0x00FF00)
+      .setTimestamp();
+
+    await channel.send({ embeds: [winnersEmbed] });
+  });
+
+  await interaction.reply({
+    content: 'Concours lancé avec succès !',
+    ephemeral: true
+  });
+}
