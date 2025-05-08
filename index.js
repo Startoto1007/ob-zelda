@@ -94,7 +94,7 @@ client.on('interactionCreate', async (interaction) => {
     // Répondre à l'utilisateur seulement si l'interaction n'a pas encore été répondue
     if (!interaction.replied && !interaction.deferred) {
       await interaction.reply({
-        content: 'Une erreur est survenue lors de l'exécution de cette commande.',
+        content: 'Une erreur est survenue lors de l\'exécution de cette commande.',
         ephemeral: true
       });
     }
