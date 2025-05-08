@@ -3,7 +3,6 @@ import 'dotenv/config';
 import { data as prestigeCommand, execute as prestigeExecute } from './commands/prestiges.js'; // Commande prestige
 import { data as moderationCommands, execute as moderationExecute } from './commands/moderationCommands.js'; // Commandes de modération
 import { data as giveawayCommands, execute as giveawayExecute } from './commands/giveawayCommands.js'; // Commandes de giveaway
-import { data as concoursCommand, execute as concoursExecute } from './commands/concours.js'; // Nouvelle commande concours
 import memberJoin from './events/memberJoin.js'; // Événement de bienvenue
 import scheduledMessages from './events/scheduledMessages.js'; // Messages planifiés
 import { handleMessageCreate as handleMessagePub } from './events/messagePub.js'; // Vérification des messages de pub
@@ -30,8 +29,7 @@ client.once('ready', async () => {
   await client.application.commands.set([
     prestigeCommand, 
     moderationCommands, 
-    giveawayCommands,
-    concoursCommand // Ajout de la nouvelle commande concours
+    giveawayCommands
   ]);
   console.log('Commandes enregistrées!');
   
@@ -83,9 +81,6 @@ client.on('interactionCreate', async (interaction) => {
         break;
       case 'giveaway':
         await giveawayExecute(interaction);
-        break;
-      case 'concours':
-        await concoursExecute(interaction);
         break;
     }
   } catch (error) {
