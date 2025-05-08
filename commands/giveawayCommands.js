@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('concours')
+  .setName('giveaway')
   .setDescription('Lancer un concours')
   .addStringOption(option => option.setName('prix').setDescription('Le prix du concours').setRequired(true))
   .addIntegerOption(option => option.setName('gagnants').setDescription('Nombre de gagnants').setRequired(true))
