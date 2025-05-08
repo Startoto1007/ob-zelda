@@ -90,8 +90,8 @@ export async function execute(interaction) {
   const gagnants = interaction.options.getInteger('gagnants');
   const dateFinStr = interaction.options.getString('date_fin');
   const rôleRequis = interaction.options.getRole('rôle_requis');
-  const dateFin = parseDate(dateFinStr);
 
+  const dateFin = parseDate(dateFinStr);
   if (!dateFin) {
     return interaction.reply({
       content: 'Format de date invalide. Utilisez le format JJ/MM/AAAA HH:MM',
@@ -111,16 +111,13 @@ export async function execute(interaction) {
   const participants = new Set();
 
   const createEmbed = (participantsCount = 0) => {
-    const maintenant = new Date();
-    const tempsRestantMs = dateFin - maintenant;
-    const tempsRestantMin = Math.floor(tempsRestantMs / 60000);
-    const heures = Math.floor(tempsRestantMin / 60);
-    const minutes = tempsRestantMin % 60;
-    const tempsRestantStr = `${heures}h ${minutes}min`;
-
-    const dateFinFormatted = `${dateFin.toLocaleDateString('fr-FR')} à ${dateFin.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-
-    let description = `🎁 Gagnez **${prix}** en participant au concours !\n👥 Nombre de gagnants : **${gagnants}**\n⏰ Se termine le : **${dateFinFormatted}** (*dans ${tempsRestantStr}*)\n👤 Lancé par : <@${interaction.user.id}>\n👤 Participants : **${participantsCount}**`;
+    const timestamp = Math.floor(dateFin.getTime() / 1000); // en secondes
+    let description = `🎁 Gagnez **${prix}** en participant au concours !\n` +
+                      `👥 Nombre de gagnants : **${gagnants}**\n` +
+                      `⏰ Se termine <t:${timestamp}:R>\n` +
+                      `📅 Fin prévue le <t:${timestamp}:F>\n` +
+                      `👤 Lancé par : <@${interaction.user.id}>\n` +
+                      `👤 Participants : **${participantsCount}**`;
 
     if (rôleRequis) {
       description += `\n🎫 Rôle requis : **${rôleRequis.name}**`;
@@ -130,7 +127,6 @@ export async function execute(interaction) {
       .setTitle('🎉 Nouveau Concours !')
       .setDescription(description)
       .setColor(0x0099ff)
-      .setFooter({ text: `Fin prévue le ${dateFinFormatted}` })
       .setTimestamp();
   };
 
@@ -188,8 +184,10 @@ export async function execute(interaction) {
       }
 
       participants.add(i.user.id);
+
       const updatedEmbed = createEmbed(participants.size);
       await message.edit({ embeds: [updatedEmbed], components: [row] });
+
       await i.reply({ content: 'Vous avez participé au concours !', ephemeral: true });
     }
   });
@@ -219,26 +217,20 @@ export async function execute(interaction) {
 
     const participantsArray = Array.from(participants);
     const winnerCount = Math.min(gagnants, participantsArray.length);
-    const selectedWinners = [];
-    const winnerIds = new Set();
+    const selectedWinners = new Set();
 
-    while (selectedWinners.length < winnerCount) {
-      const randomIndex = Math.floor(Math.random() * participantsArray.length);
-      const winnerId = participantsArray[randomIndex];
-
-      if (!winnerIds.has(winnerId)) {
-        winnerIds.add(winnerId);
-        selectedWinners.push(`<@${winnerId}>`);
-      }
+    while (selectedWinners.size < winnerCount) {
+      const randomId = participantsArray[Math.floor(Math.random() * participantsArray.length)];
+      selectedWinners.add(randomId);
     }
 
-    const winnersEmbed = new EmbedBuilder()
+    const resultEmbed = new EmbedBuilder()
       .setTitle('🎉 Résultats du Concours !')
-      .setDescription(`Félicitations à nos ${selectedWinners.length} gagnant(s) pour **${prix}** :\n\n${selectedWinners.join('\n')}`)
+      .setDescription(`Félicitations à :\n${[...selectedWinners].map(id => `<@${id}>`).join('\n')}`)
       .setColor(0x00FF00)
       .setTimestamp();
 
-    await channel.send({ embeds: [winnersEmbed] });
+    await channel.send({ embeds: [resultEmbed] });
   });
 
   await interaction.reply({
