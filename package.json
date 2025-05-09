@@ -7,7 +7,6 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "startCommand": "node index.js"
     "discord.js": "^14.0.0",
     "dotenv": "^16.0.0",
     "canvas": "^2.8.0",
