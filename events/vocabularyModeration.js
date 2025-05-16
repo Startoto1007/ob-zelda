@@ -25,6 +25,9 @@ const BAD_WORDS = ['abruti', 'idiot', 'stupide', 'connard', 'connasse', 'merde',
   'tr*uduc', 'troud*k', 'trou.d.c',
   'c*nnasse', 'conn4sse', 'c0nnasse']; // Remplacez par les mots que vous souhaitez surveiller
 
+// ID du salon exempté de la modération automatique
+const EXEMPTED_CHANNEL_ID = '1365354306798354536';
+
 /**
  * Gère la détection des gros mots dans les messages
  * @param {Object} message - Le message Discord
@@ -33,6 +36,9 @@ const BAD_WORDS = ['abruti', 'idiot', 'stupide', 'connard', 'connasse', 'merde',
 export const handleMessageCreate = async (message) => {
   // Ignorer les messages des bots
   if (message.author.bot) return;
+  
+  // Ignorer les messages dans le salon exempté
+  if (message.channel.id === EXEMPTED_CHANNEL_ID) return;
   
   const content = message.content.toLowerCase();
   const badWordsDetected = BAD_WORDS.some(word => content.includes(word));
